@@ -4,6 +4,8 @@ description: Configuring CPAC.
 order: 3
 ---
 
-# Configuration
+## Configuration
 
-CPAC uses a standard TOML configuration file located at `/etc/cpac/config.toml`.
+You can use the `cpac config` command to change the configuration
+
+Alternatively `cpac` uses a standard TOML configuration file located at `/etc/cpac/config.toml`.
