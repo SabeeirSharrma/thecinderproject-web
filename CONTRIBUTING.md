@@ -2,7 +2,7 @@
 
 Thank you for your interest in our repository/codebase.
 
-## 🛑 Contribution Policy
+## Contribution Policy
 
 **At this time, we are not accepting unsolicited pull requests or direct commits to this repository.**
 
@@ -19,7 +19,7 @@ If you are interested in contributing, you must first reach out to the project m
 - **Owner/Main Developer:** [Sabeeir Sharrma](https://github.com/sabeeirsharrma)
 - **Maintainer/Assistant Developer:** [trigered02](https://github.com/trigered02)
 
-Only after being officially invited as a collaborator or receiving explicit permission from the core team may you begin submitting changes.
+Only after being officially invited as a collaborator or joining our organization or receiving explicit permission from the core team may you begin submitting changes.
 
 Alternatively, you can suggest improvements by creating a new issue or reporting it to us on our [Discord Server](https://discord.com/invite/3ZMtEgJjFT)
 
