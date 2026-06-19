@@ -31,38 +31,451 @@
   /* Mapping some defaults for easier tailwind usage */
   --color-background: var(--color-base);
   --color-foreground: var(--color-primary-text);
-  
+
   --color-primary: var(--color-deep-red);
   --color-secondary: var(--color-ember-core);
   --color-accent: var(--color-ember-glow);
 }
 
+/* KEYFRAME ANIMATIONS */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes glowPulse {
+
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.3;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes emberFloat {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: translateY(-20px) scale(1.2);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-40px) scale(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes borderGlow {
+
+  0%,
+  100% {
+    border-color: var(--color-border);
+  }
+
+  50% {
+    border-color: var(--color-cinder-mid);
+  }
+}
+
+@keyframes textShimmer {
+  0% {
+    background-position: -200% center;
+  }
+
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes drawLine {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 100%;
+  }
+}
+
+/* ==============================
+   SCROLL REVEAL SYSTEM
+   ============================== */
+
+/* Elements start hidden, animate in when .revealed is added by JS */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Directional variants */
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-left.revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-right.revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-scale.revealed {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Stagger delays for children */
+.stagger-1 {
+  transition-delay: 0.1s;
+}
+
+.stagger-2 {
+  transition-delay: 0.2s;
+}
+
+.stagger-3 {
+  transition-delay: 0.3s;
+}
+
+.stagger-4 {
+  transition-delay: 0.4s;
+}
+
+.stagger-5 {
+  transition-delay: 0.5s;
+}
+
+.stagger-6 {
+  transition-delay: 0.6s;
+}
+
+/* ==============================
+   ON-LOAD ANIMATIONS
+   ============================== */
+
+.anim-fade-in {
+  animation: fadeIn 0.8s ease-out both;
+}
+
+.anim-slide-up {
+  animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.anim-slide-down {
+  animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.anim-scale-in {
+  animation: scaleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Animation delays */
+.delay-1 {
+  animation-delay: 0.1s;
+}
+
+.delay-2 {
+  animation-delay: 0.2s;
+}
+
+.delay-3 {
+  animation-delay: 0.35s;
+}
+
+.delay-4 {
+  animation-delay: 0.5s;
+}
+
+.delay-5 {
+  animation-delay: 0.65s;
+}
+
+/* ==============================
+   BASE STYLES
+   ============================== */
+
 @layer base {
   body {
     @apply bg-base text-primary-text font-body antialiased;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-heading tracking-wide;
   }
 
-  h1 { @apply text-4xl md:text-5xl lg:text-6xl; }
-  h2 { @apply text-3xl md:text-4xl; }
-  h3 { @apply text-2xl md:text-3xl; }
-  
-  p { @apply leading-relaxed; }
-  
-  a { @apply transition-colors duration-200; }
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl;
+  }
+
+  p {
+    @apply leading-relaxed;
+  }
+
+  a {
+    @apply transition-colors duration-200;
+  }
+
+  /* Smooth scroll for anchor links */
+  html {
+    scroll-behavior: smooth;
+  }
 }
+
+/* ==============================
+   COMPONENTS
+   ============================== */
 
 @layer components {
   .btn-primary {
     @apply inline-flex items-center justify-center px-6 py-3 bg-firebrick text-white font-heading tracking-wider rounded-md hover:bg-ember-core focus:ring-2 focus:ring-ember-glow focus:outline-none transition-all duration-300;
+    position: relative;
+    overflow: hidden;
   }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 69, 0, 0.3);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
   .btn-secondary {
     @apply inline-flex items-center justify-center px-6 py-3 bg-surface text-white border border-border font-heading tracking-wider rounded-md hover:bg-card hover:border-ember-core focus:ring-2 focus:ring-ember-glow focus:outline-none transition-all duration-300;
   }
+
+  .btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 69, 0, 0.15);
+  }
+
+  .btn-secondary:active {
+    transform: translateY(0);
+  }
+
   .card {
-    @apply bg-card border border-border rounded-lg p-6 shadow-lg hover:shadow-xl hover:border-cinder-mid transition-all duration-300;
+    @apply bg-card border border-border rounded-lg p-6 shadow-lg transition-all duration-300;
+    position: relative;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: var(--color-cinder-mid);
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.4),
+      0 0 30px rgba(255, 69, 0, 0.08);
+  }
+}
+
+/* ==============================
+   SPECIAL EFFECTS
+   ============================== */
+
+/* Ember glow background for hero */
+.ember-glow-bg {
+  background: radial-gradient(circle at center, var(--color-ember-core) 0%, transparent 70%);
+  animation: glowPulse 4s ease-in-out infinite;
+}
+
+/* Shimmer text effect */
+.text-shimmer {
+  background: linear-gradient(90deg,
+      var(--color-primary-text) 0%,
+      var(--color-ember-light) 25%,
+      var(--color-ember-glow) 50%,
+      var(--color-ember-light) 75%,
+      var(--color-primary-text) 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textShimmer 4s linear infinite;
+}
+
+/* Animated underline for headings */
+.heading-line::after {
+  content: '';
+  display: block;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-ember-core), transparent);
+  margin-top: 0.5rem;
+  animation: drawLine 0.8s ease-out both;
+}
+
+/* Floating ember particles (CSS-only decorative) */
+.ember-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--color-ember-core);
+  animation: emberFloat 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.ember-particle:nth-child(1) {
+  left: 20%;
+  animation-delay: 0s;
+  animation-duration: 3s;
+}
+
+.ember-particle:nth-child(2) {
+  left: 40%;
+  animation-delay: 0.5s;
+  animation-duration: 3.5s;
+}
+
+.ember-particle:nth-child(3) {
+  left: 60%;
+  animation-delay: 1s;
+  animation-duration: 2.8s;
+}
+
+.ember-particle:nth-child(4) {
+  left: 80%;
+  animation-delay: 1.5s;
+  animation-duration: 3.2s;
+}
+
+.ember-particle:nth-child(5) {
+  left: 50%;
+  animation-delay: 2s;
+  animation-duration: 4s;
+}
+
+/* Prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+  .reveal,
+  .reveal-left,
+  .reveal-right,
+  .reveal-scale {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

@@ -27,5 +27,42 @@ const { title, description = "The Cinder Project" } = Astro.props;
       <slot />
     </main>
     <Footer />
+
+    <!-- Scroll Reveal + Animations Script -->
+    <script>
+      // Intersection Observer for scroll-triggered reveals
+      const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
+      
+      if (revealElements.length > 0) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('revealed');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, {
+          threshold: 0.1,
+          rootMargin: '0px 0px -50px 0px'
+        });
+
+        revealElements.forEach(el => observer.observe(el));
+      }
+
+      // Navbar scroll effect — add shadow + opacity on scroll
+      const navbar = document.querySelector('header');
+      if (navbar) {
+        window.addEventListener('scroll', () => {
+          if (window.scrollY > 20) {
+            navbar.classList.add('shadow-lg');
+            navbar.style.borderBottomColor = 'var(--color-cinder-mid)';
+          } else {
+            navbar.classList.remove('shadow-lg');
+            navbar.style.borderBottomColor = '';
+          }
+        }, { passive: true });
+      }
+    </script>
   </body>
 </html>
+
