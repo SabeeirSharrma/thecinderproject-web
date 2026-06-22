@@ -11,3 +11,5 @@ The official website for **The Cinder Project**, an Open-source organization ded
 **Built on: [Astro ✨](https://astro.build/)**
 
 FOR CONTRIBUTIONS TO THIS REPOSITORY PLEASE READ [CONTRIBUTING.md](CONTRIBUTING.md)
+
+LICENSE: GNU GPL V3.0
