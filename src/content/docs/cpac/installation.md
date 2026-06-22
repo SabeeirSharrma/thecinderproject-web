@@ -6,6 +6,8 @@ order: 2
 
 # Installation
 
+CPAC runs on any Arch-based Linux distribution, including Arch, EndeavourOS, Garuda, CachyOS, and Manjaro.
+
 To install CPAC, you can build from source (recommended) or alternatively you can install it from the AUR via yay/paru.
 
 ## Quick Install Script (Recommended)
@@ -70,6 +72,22 @@ $ paru -S cpac
 ```
 
 > **Note:** CPAC isn't installed yet at this point, so its own trust analysis isn't
-> available to evaluate this install — this is the one bootstrapping exception to
+> available to evaluate this install -- this is the one bootstrapping exception to
 > CPAC's usual AUR-last, trust-checked install flow. Once CPAC is installed via any
 > method, all future package installs go through its normal resolution and trust scoring.
+
+## Verify Installation
+
+After installing, run:
+
+```bash
+cpac --help
+```
+
+If your shell prints `cpac: command not found`, Cargo's bin directory is not on your `PATH`. Add it for the current terminal session:
+
+```bash
+export PATH="$HOME/.cargo/bin:$PATH"
+```
+
+To make that permanent, add the same line to your shell config (`~/.bashrc`, `~/.zshrc`, etc.) and restart your terminal.
