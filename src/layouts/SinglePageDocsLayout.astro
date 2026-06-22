@@ -26,7 +26,7 @@ projectDocs.sort((a: any, b: any) => {
 // Render all docs and extract h2 headings from body
 const renderedDocs = await Promise.all(
   projectDocs.map(async (doc: any) => {
-    const { Content } = await render(doc);
+    const { Content, headings } = await render(doc);
     
     // Extract slug from doc id (e.g. "cpac/installation" -> "installation", "cpac/index" -> "index")
     const parts = doc.id.split('/');
@@ -34,23 +34,12 @@ const renderedDocs = await Promise.all(
     // Prefix with 'topic-' to avoid ID collisions with markdown-generated heading IDs
     const sectionId = `topic-${slug}`;
     
-    // Extract ## headings from the raw body for sidebar sub-topics
-    const h2Regex = /^##\s+(.+)$/gm;
-    const headings: { text: string; id: string }[] = [];
-    let match;
-    while ((match = h2Regex.exec(doc.body || '')) !== null) {
-      const text = match[1].trim();
-      // Generate an id that matches what Astro's markdown renderer produces
-      const id = text
-        .toLowerCase()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-')
-        .replace(/^-|-$/g, '');
-      headings.push({ text, id });
-    }
+    // Use h2 headings from Astro's markdown pipeline for sidebar sub-topics
+    const filteredHeadings = headings
+      .filter((h: any) => h.depth === 2)
+      .map((h: any) => ({ text: h.text, id: h.slug }));
     
-    return { doc, Content, sectionId, slug, headings };
+    return { doc, Content, sectionId, slug, headings: filteredHeadings };
   })
 );
 
