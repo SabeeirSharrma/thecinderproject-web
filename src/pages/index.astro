@@ -26,7 +26,7 @@ import MainLayout from '../layouts/MainLayout.astro';
       </p>
       <div class="flex flex-col sm:flex-row justify-center gap-4 anim-slide-up delay-3">
         <a href="#projects" class="btn-primary">View Projects</a>
-        <a href="#docs" class="btn-secondary">Read Docs</a>
+        <a href="https://discord.gg/3ZMtEgJjFT" target="_blank" rel="noopener noreferrer" class="btn-secondary">Join Discord</a>
       </div>
     </div>
   </section>
@@ -48,29 +48,27 @@ import MainLayout from '../layouts/MainLayout.astro';
       
       <!-- CPAC Card -->
       <div class="card group relative overflow-hidden reveal stagger-1">
-        <a href="/cpac" class="absolute inset-0 z-10" aria-label="View CPAC project"></a>
         <div class="absolute top-0 right-0 w-32 h-32 bg-deep-red rounded-bl-full opacity-10 group-hover:opacity-30 transition-opacity duration-500"></div>
         <h3 class="text-2xl font-heading text-white mb-4">CPAC</h3>
         <p class="text-muted-text mb-8">
-          Package management and deployment. A tool built for seamless integration and robust dependency resolution.
+          Community Package Analysis Client: a package trust layer for Arch-based Linux distributions. CPAC is an advisor, not a package manager replacement. It helps answer whether a package looks trustworthy before you install it. Gives you trust and makes you think, "Is this truly safe to install?".
         </p>
         <div class="flex gap-4 relative z-20">
-          <span class="text-ember-light font-bold uppercase tracking-wider text-sm">CPAC Page</span>
-          <a href="/cpac/docs" class="text-muted-text hover:text-white uppercase tracking-wider text-sm transition-colors">Docs</a>
+          <a href="/cpac" class="btn-primary text-sm px-4 py-2">CPAC Page</a>
+          <a href="/cpac/docs" class="btn-secondary text-sm px-4 py-2">Docs</a>
         </div>
       </div>
 
-      <!-- CinderOS Card -->
+      <!-- CPAC Trust DB Card -->
       <div class="card group relative overflow-hidden reveal stagger-2">
-        <a href="/cinderos" class="absolute inset-0 z-10" aria-label="View CinderOS project"></a>
         <div class="absolute top-0 right-0 w-32 h-32 bg-ember-core rounded-bl-full opacity-10 group-hover:opacity-30 transition-opacity duration-500"></div>
-        <h3 class="text-2xl font-heading text-white mb-4">CinderOS</h3>
+        <h3 class="text-2xl font-heading text-white mb-4">CPAC Trust DB</h3>
         <p class="text-muted-text mb-8">
-          A Cinder Project operating system. Lightweight, modular, and designed from the ground up for stability and performance.
+          Community-maintained trust database for CPAC that stores sanitized/anonymized hashes and PKGBUILDS with advisories for cpac clients. This DB allows CPAC to keep users safe by adding proper checks instead of just relying on public repo data.
         </p>
         <div class="flex gap-4 relative z-20">
-          <span class="text-ember-light font-bold uppercase tracking-wider text-sm">CinderOS Page</span>
-          <a href="/cinderos/docs" class="text-muted-text hover:text-white uppercase tracking-wider text-sm transition-colors">Docs</a>
+          <a href="/cpac-trust-db" class="btn-primary text-sm px-4 py-2">CPAC Trust DB Page</a>
+          <a href="/cpac-trust-db/docs" class="btn-secondary text-sm px-4 py-2">Docs</a>
         </div>
       </div>
 
