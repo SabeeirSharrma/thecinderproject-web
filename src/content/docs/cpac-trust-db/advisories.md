@@ -39,14 +39,20 @@ Community members report via GitHub issue or Discord. Core team reviews evidence
 
 ## Trust Score Impact
 
+The `severity` and `status` fields in the TOML advisory are evaluated independently. Severity applies a base penalty; status applies an additional adjustment on top. For example, `severity = "critical"` with `status = "suspected"` applies the critical penalty (-30) plus the suspected adjustment (-15) for a combined -45.
+
 | Severity | Trust Penalty | Recommendation Floor |
 |---|---|---|
 | Critical | -30 | DANGER |
 | High | -20 | WARNING |
 | Medium | -10 | CAUTION |
 | Low | -5 | No floor change |
-| Suspected (any) | -15 | WARNING |
-| Resolved | 0 | No penalty |
+
+| Status | Additional Adjustment |
+|---|---|
+| Confirmed | 0 (no change to severity penalty) |
+| Suspected | -15 |
+| Resolved | Reverts severity penalty to 0 |
 
 ---
 

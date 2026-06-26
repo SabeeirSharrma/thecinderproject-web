@@ -14,7 +14,7 @@ CPAC never blindly re-downloads the full database. Instead it uses a lightweight
 
 **When:** Every `cpac install`, `cpac trust`, `cpac audit`
 
-```
+```text
 GET /api/meta
   → { version: "abc123" }
           ↓
@@ -30,7 +30,7 @@ Compare against local ~/.cpac/trust-db/meta.toml
 
 **When:** `cpac update`, or when meta check detects a change
 
-```
+```text
 GET /api/delta?since=<last_sync_timestamp>
   → only changed advisories and snapshots since last sync
           ↓

@@ -12,7 +12,7 @@ Push to `main` (advisory added or snapshot aggregated).
 
 ## Pipeline Steps
 
-```
+```text
 Trigger: push to main (advisory added or snapshot aggregated)
         ↓
 Action 1: Validate TOML schema
@@ -23,6 +23,8 @@ Action 3: Update meta/db.toml with new version hash + timestamp
         ↓
 Action 4: Cut a new GitHub release with changelog (advisories only)
 ```
+
+> **Note:** `meta/db.toml` is the repo-side state file updated by this pipeline. Do not confuse it with `~/.cpac/trust-db/meta.toml` (the local cache, documented in [Local Cache](local-cache.md)) or the `/api/meta` endpoint (documented in [API Endpoints](api.md)).
 
 ## What It Does
 

@@ -32,7 +32,7 @@ Stored as sanitized PKGBUILD text. Pass 1 structural redaction (local paths, hos
 
 ## Submission Pipeline
 
-```
+```text
 cpac install some-aur-package
         ↓
 Fetch PKGBUILD locally

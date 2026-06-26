@@ -8,7 +8,7 @@ order: 5
 
 ## Storage Location
 
-```
+```text
 ~/.cpac/trust-db/
   meta.toml           # version hash, last sync timestamp, schema version
   advisories.db       # compiled advisory index (fast lookup by package name)

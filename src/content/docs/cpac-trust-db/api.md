@@ -8,13 +8,13 @@ order: 3
 
 All endpoints are public read. Writes require an authenticated token.
 
-Base URL: `thecinderproject.qd.je/cpac-trust-db/api/`
+Base URL: `https://thecinderproject.qd.je/cpac-trust-db/api/`
 
 ---
 
 ## Meta
 
-```
+```text
 GET /api/meta
 → {
     version: "abc123",          # hash of current DB state
@@ -31,7 +31,7 @@ Used by CPAC clients to check if their local cache is stale without downloading 
 
 ## Advisories
 
-```
+```text
 GET /api/advisories
 → [ ...all advisories... ]
 
@@ -43,7 +43,7 @@ GET /api/advisories/<package-name>
 
 ## Snapshots
 
-```
+```text
 GET /api/snapshots/<package-name>
 → { hashes: [...], pkgbuilds: [...] }
 
@@ -55,7 +55,7 @@ GET /api/snapshots/<package-name>/<version>
 
 ## Delta Sync
 
-```
+```text
 GET /api/delta?since=<timestamp>
 → { advisories: [...changed...], snapshots: [...changed...] }
 ```
@@ -66,13 +66,13 @@ Used by `cpac update` to pull only records that changed since the last sync, rat
 
 ## Submissions (Authenticated)
 
-```
+```text
 POST /api/submit/snapshot
 Authorization: Bearer <token>
 → Submit a PKGBUILD hash or full sanitized PKGBUILD
 ```
 
-Tokens are issued per CPAC installation on first run (anonymous, non-identifying). Used for rate limiting and abuse prevention only — not for identifying users.
+Tokens are issued per CPAC installation on first run (anonymous, non-identifying). Used for rate limiting and abuse prevention only — not for identifying users. See [Auth Model](auth.md) for token issuance details.
 
 ---
 
