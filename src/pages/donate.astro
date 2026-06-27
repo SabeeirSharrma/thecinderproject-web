@@ -1,0 +1,358 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+---
+
+<MainLayout title="Donate" description="Support The Cinder Project — keep the open-source tools running.">
+  <div class="container mx-auto px-4 py-16 max-w-xl">
+
+    <!-- Header -->
+    <header class="mb-12 text-center">
+      <div class="flex items-center justify-center gap-2 text-xs font-bold tracking-widest uppercase text-ember-core mb-3 anim-slide-up">
+        <svg class="w-4 h-4" viewBox="0 0 16 16" fill="none">
+          <path d="M8 2C8 2 5 5 5 8.5C5 10.4 6.3 12 8 12C9.7 12 11 10.4 11 8.5C11 5.5 8 2 8 2Z" fill="currentColor"/>
+          <path d="M8 6.5C8 6.5 6.5 8 6.5 9.5C6.5 10.3 7.2 11 8 11C8.8 11 9.5 10.3 9.5 9.5C9.5 8 8 6.5 8 6.5Z" fill="#FFD4B8"/>
+        </svg>
+        Support open source
+      </div>
+      <h1 class="text-4xl md:text-5xl font-heading text-white mb-4 uppercase tracking-widest anim-slide-up delay-2">Keep the cinders burning</h1>
+      <p class="text-lg text-muted-text leading-relaxed anim-slide-up delay-3">
+        The Cinder Project builds free, open-source tools like <a href="/cpac" class="text-ember-light hover:text-ember-core transition-colors">CPAC</a> and CinderOS. Your support helps keep the servers on and the code flowing.
+      </p>
+    </header>
+
+    <!-- Amount Selection -->
+    <section class="mb-8 reveal">
+      <label class="block text-xs font-bold tracking-widest uppercase text-muted-text mb-3">Choose an amount</label>
+      <div class="grid grid-cols-4 gap-2 mb-3">
+        <button class="amt-btn" data-amount="50">₹50</button>
+        <button class="amt-btn" data-amount="100">₹100</button>
+        <button class="amt-btn" data-amount="250">₹250</button>
+        <button class="amt-btn active" data-amount="500">₹500</button>
+      </div>
+      <div class="relative">
+        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-muted-text pointer-events-none">₹</span>
+        <input
+          class="custom-input"
+          type="number"
+          id="customAmt"
+          placeholder="Custom amount"
+          min="1"
+        />
+      </div>
+    </section>
+
+    <!-- Payment Gateway -->
+    <section class="mb-8 reveal stagger-1">
+      <label class="block text-xs font-bold tracking-widest uppercase text-muted-text mb-3">Pay with</label>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+        <button class="gw-btn" id="upiBtn">
+          <div class="gw-icon upi">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M4 11L11 4L18 11L11 18L4 11Z" fill="#00B9F1" opacity="0.9"/>
+              <path d="M8 11L11 8L14 11L11 14L8 11Z" fill="#fff" opacity="0.9"/>
+            </svg>
+          </div>
+          <div class="gw-name">UPI</div>
+          <div class="gw-sub">GPay, PhonePe, Paytm, any UPI app</div>
+        </button>
+
+        <button class="gw-btn opacity-50 cursor-default" disabled>
+          <div class="gw-icon rzp">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M6 16L10 6H14L16 16H13L12.5 13.5H9.5L9 16H6Z" fill="#1D63FF"/>
+              <path d="M10 11.5L10.5 8.5H11.5L12 11.5H10Z" fill="#fff" opacity="0.6"/>
+            </svg>
+          </div>
+          <div class="gw-name">Razorpay</div>
+          <div class="gw-sub">Cards &amp; netbanking — coming soon</div>
+        </button>
+
+      </div>
+    </section>
+
+    <!-- Footer Note -->
+    <p class="text-center text-xs text-muted-text leading-relaxed reveal stagger-2">
+      All payments go directly to the project maintainer.<br>
+      No fees deducted on UPI.
+    </p>
+
+  </div>
+
+  <!-- UPI Modal -->
+  <div class="modal-overlay" id="upiModal">
+    <div class="modal">
+      <button class="modal-close" id="modalClose">&times;</button>
+      <div class="modal-title">Scan to pay via UPI</div>
+      <div class="modal-amt" id="modalAmt">₹500</div>
+      <div class="qr-wrap">
+        <img id="qrImg" src="" alt="UPI QR Code" width="180" height="180" />
+      </div>
+      <div class="upi-id">7211170000@fam</div>
+      <a class="open-app-btn" id="openAppLink" href="#">Open UPI app</a>
+      <div class="upi-hint">
+        Scan with any UPI app — GPay, PhonePe, Paytm, BHIM, etc.<br />
+        Or tap the button to open your UPI app directly.
+      </div>
+    </div>
+  </div>
+</MainLayout>
+
+<style>
+  /* Amount buttons */
+  .amt-btn {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    color: var(--color-muted-text);
+    font-size: 15px;
+    font-weight: 600;
+    font-family: var(--font-heading);
+    letter-spacing: 0.05em;
+    padding: 0.75rem 0;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .amt-btn:hover {
+    border-color: var(--color-ember-core);
+    color: var(--color-ember-core);
+    background: rgba(255, 69, 0, 0.08);
+  }
+  .amt-btn.active {
+    border-color: var(--color-ember-core);
+    color: var(--color-ember-core);
+    background: rgba(255, 69, 0, 0.08);
+  }
+
+  /* Custom input */
+  .custom-input {
+    width: 100%;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    color: var(--color-primary-text);
+    font-size: 15px;
+    font-family: var(--font-body);
+    padding: 0.75rem 1rem 0.75rem 2.25rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .custom-input::placeholder { color: var(--color-muted-text); opacity: 0.5; }
+  .custom-input:focus { border-color: var(--color-ember-core); }
+
+  /* Gateway buttons */
+  .gw-btn {
+    border-radius: 16px;
+    padding: 1rem;
+    cursor: pointer;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+    transition: all 0.15s;
+    font-family: inherit;
+    text-align: left;
+  }
+  .gw-btn:not([disabled]):hover {
+    border-color: var(--color-ember-core);
+    background: rgba(255, 69, 0, 0.08);
+  }
+  .gw-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2px;
+  }
+  .gw-icon.rzp { background: rgba(29, 99, 255, 0.09); }
+  .gw-icon.upi { background: rgba(0, 185, 241, 0.09); }
+  .gw-name {
+    font-size: 14px;
+    font-weight: 600;
+    font-family: var(--font-heading);
+    color: var(--color-primary-text);
+    line-height: 1;
+  }
+  .gw-sub {
+    font-size: 12px;
+    color: var(--color-muted-text);
+    line-height: 1.3;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 380px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    position: relative;
+  }
+  .modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: var(--color-muted-text);
+    cursor: pointer;
+    font-size: 24px;
+    line-height: 1;
+    padding: 2px 6px;
+    border-radius: 6px;
+    transition: background 0.1s;
+  }
+  .modal-close:hover { background: var(--color-card); }
+
+  .modal-title {
+    font-size: 17px;
+    font-weight: 700;
+    font-family: var(--font-heading);
+    color: var(--color-primary-text);
+    text-align: center;
+  }
+  .modal-amt {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--color-ember-core);
+    letter-spacing: -0.03em;
+  }
+  .qr-wrap {
+    background: var(--color-base);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 1rem;
+  }
+  .qr-wrap img { display: block; width: 180px; height: 180px; }
+
+  .upi-id {
+    font-size: 13px;
+    color: var(--color-muted-text);
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 0.4rem 0.75rem;
+    letter-spacing: 0.02em;
+  }
+  .upi-hint {
+    font-size: 12px;
+    color: var(--color-muted-text);
+    opacity: 0.5;
+    text-align: center;
+    line-height: 1.5;
+  }
+  .open-app-btn {
+    width: 100%;
+    background: var(--color-ember-core);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: var(--font-heading);
+    letter-spacing: 0.05em;
+    padding: 0.85rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+  }
+  .open-app-btn:hover { background: var(--color-ember-deep); }
+
+  @media (max-width: 480px) {
+    .gw-btn { grid-column: span 1; }
+  }
+</style>
+
+<script>
+  let selectedAmt = 500;
+  const QR_B64 = "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";
+
+  // Amount selection
+  document.querySelectorAll('.amt-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.amt-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedAmt = parseInt(btn.getAttribute('data-amount') || '500');
+      const custom = document.getElementById('customAmt') as HTMLInputElement;
+      if (custom) custom.value = '';
+    });
+  });
+
+  // Custom amount input
+  const customInput = document.getElementById('customAmt') as HTMLInputElement;
+  if (customInput) {
+    customInput.addEventListener('input', () => {
+      document.querySelectorAll('.amt-btn').forEach(b => b.classList.remove('active'));
+      selectedAmt = parseInt(customInput.value) || 0;
+    });
+  }
+
+  function getAmt(): number {
+    const custom = document.getElementById('customAmt') as HTMLInputElement;
+    if (custom && custom.value && parseInt(custom.value) > 0) return parseInt(custom.value);
+    return selectedAmt;
+  }
+
+  // UPI modal
+  const upiBtn = document.getElementById('upiBtn');
+  const modal = document.getElementById('upiModal');
+  const modalClose = document.getElementById('modalClose');
+  const modalAmt = document.getElementById('modalAmt');
+  const qrImg = document.getElementById('qrImg') as HTMLImageElement;
+  const openAppLink = document.getElementById('openAppLink') as HTMLAnchorElement;
+
+  function openUPI() {
+    const amt = getAmt();
+    if (!amt || amt < 1) {
+      alert('Please select or enter an amount first.');
+      return;
+    }
+    const vpa = '7211170000@fam';
+    const name = 'The Cinder Project';
+    const upiLink = 'upi://pay?pa=' + encodeURIComponent(vpa) + '&pn=' + encodeURIComponent(name) + '&am=' + amt + '&cu=INR&tn=' + encodeURIComponent('Donation - The Cinder Project');
+    if (modalAmt) modalAmt.textContent = '₹' + amt;
+    if (qrImg) qrImg.src = 'data:image/png;base64,' + QR_B64;
+    if (openAppLink) openAppLink.href = upiLink;
+    if (modal) modal.classList.add('open');
+  }
+
+  function closeModal() {
+    if (modal) modal.classList.remove('open');
+  }
+
+  if (upiBtn) upiBtn.addEventListener('click', openUPI);
+  if (modalClose) modalClose.addEventListener('click', closeModal);
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+  });
+</script>
