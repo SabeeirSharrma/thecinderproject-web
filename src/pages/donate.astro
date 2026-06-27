@@ -83,16 +83,47 @@ import MainLayout from '../layouts/MainLayout.astro';
   <div class="modal-overlay" id="upiModal">
     <div class="modal">
       <button class="modal-close" id="modalClose">&times;</button>
-      <div class="modal-title">Scan to pay via UPI</div>
+      <div class="modal-title">Pay via UPI</div>
       <div class="modal-amt" id="modalAmt">₹500</div>
+
+      <!-- QR Code (generated dynamically) -->
       <div class="qr-wrap">
-        <img id="qrImg" src="" alt="UPI QR Code" width="180" height="180" />
+        <canvas id="qrCanvas" width="180" height="180"></canvas>
       </div>
-      <div class="upi-id">7211170000@fam</div>
-      <a class="open-app-btn" id="openAppLink" href="#">Open UPI app</a>
-      <div class="upi-hint">
-        Scan with any UPI app — GPay, PhonePe, Paytm, BHIM, etc.<br />
-        Or tap the button to open your UPI app directly.
+
+      <!-- UPI ID with copy -->
+      <div class="upi-id-row">
+        <div class="upi-id" id="upiIdDisplay">7211170000@fam</div>
+        <button class="copy-btn" id="copyUpiBtn" title="Copy UPI ID">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          <span id="copyLabel">Copy</span>
+        </button>
+      </div>
+
+      <!-- Desktop: copy full UPI string -->
+      <button class="copy-full-btn" id="copyFullBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+        Copy UPI payment string
+      </button>
+
+      <!-- Mobile: open UPI app -->
+      <a class="open-app-btn" id="openAppLink" href="#">
+        Open UPI app
+      </a>
+
+      <!-- Desktop hint -->
+      <div class="upi-hint desktop-hint">
+        Open your UPI app on your phone and scan the QR code, or copy the UPI ID and pay manually.
+      </div>
+      <!-- Mobile hint -->
+      <div class="upi-hint mobile-hint">
+        Scan with any UPI app — GPay, PhonePe, Paytm, BHIM, etc.
       </div>
     </div>
   </div>
@@ -243,9 +274,18 @@ import MainLayout from '../layouts/MainLayout.astro';
     border: 1px solid var(--color-border);
     border-radius: 10px;
     padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  .qr-wrap img { display: block; width: 180px; height: 180px; }
+  .qr-wrap canvas { display: block; width: 180px; height: 180px; }
 
+  /* UPI ID row */
+  .upi-id-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
   .upi-id {
     font-size: 13px;
     color: var(--color-muted-text);
@@ -256,6 +296,56 @@ import MainLayout from '../layouts/MainLayout.astro';
     padding: 0.4rem 0.75rem;
     letter-spacing: 0.02em;
   }
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 0.4rem 0.6rem;
+    color: var(--color-muted-text);
+    cursor: pointer;
+    font-size: 12px;
+    font-family: var(--font-body);
+    transition: all 0.15s;
+  }
+  .copy-btn:hover {
+    border-color: var(--color-ember-core);
+    color: var(--color-ember-core);
+  }
+  .copy-btn.copied {
+    border-color: #4ade80;
+    color: #4ade80;
+  }
+
+  /* Copy full UPI string button */
+  .copy-full-btn {
+    width: 100%;
+    background: var(--color-card);
+    color: var(--color-muted-text);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: var(--font-body);
+    padding: 0.6rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.15s;
+  }
+  .copy-full-btn:hover {
+    border-color: var(--color-ember-core);
+    color: var(--color-ember-core);
+  }
+  .copy-full-btn.copied {
+    border-color: #4ade80;
+    color: #4ade80;
+  }
+
   .upi-hint {
     font-size: 12px;
     color: var(--color-muted-text);
@@ -263,6 +353,16 @@ import MainLayout from '../layouts/MainLayout.astro';
     text-align: center;
     line-height: 1.5;
   }
+
+  /* Show/hide hints based on device */
+  .desktop-hint { display: none; }
+  .mobile-hint { display: block; }
+
+  @media (hover: hover) and (pointer: fine) {
+    .desktop-hint { display: block; }
+    .mobile-hint { display: none; }
+  }
+
   .open-app-btn {
     width: 100%;
     background: var(--color-ember-core);
@@ -282,14 +382,47 @@ import MainLayout from '../layouts/MainLayout.astro';
   }
   .open-app-btn:hover { background: var(--color-ember-deep); }
 
+  /* Hide "Open UPI app" on desktop (no UPI apps there) */
+  @media (hover: hover) and (pointer: fine) {
+    .open-app-btn { display: none; }
+  }
+
   @media (max-width: 480px) {
     .gw-btn { grid-column: span 1; }
   }
 </style>
 
+<script is:inline src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script>
   let selectedAmt = 500;
-  const QR_B64 = "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";
+  let qr: any = null;
+
+  function buildUpiString(amt: number): string {
+    const vpa = '7211170000@fam';
+    const name = 'The Cinder Project';
+    return `upi://pay?pa=${encodeURIComponent(vpa)}&pn=${encodeURIComponent(name)}&am=${amt}&cu=INR&tn=${encodeURIComponent('Donation - The Cinder Project')}`;
+  }
+
+  function getAmt(): number {
+    const custom = document.getElementById('customAmt') as HTMLInputElement;
+    if (custom && custom.value && parseInt(custom.value) > 0) return parseInt(custom.value);
+    return selectedAmt;
+  }
+
+  function generateQR(amt: number) {
+    const canvas = document.getElementById('qrCanvas') as HTMLCanvasElement;
+    if (!canvas) return;
+    canvas.innerHTML = '';
+    const upiStr = buildUpiString(amt);
+    qr = new (window as any).QRCode(canvas, {
+      text: upiStr,
+      width: 180,
+      height: 180,
+      colorDark: '#FFFFFF',
+      colorLight: '#111111',
+      correctLevel: (window as any).QRCode.CorrectLevel.M,
+    });
+  }
 
   // Amount selection
   document.querySelectorAll('.amt-btn').forEach(btn => {
@@ -311,19 +444,14 @@ import MainLayout from '../layouts/MainLayout.astro';
     });
   }
 
-  function getAmt(): number {
-    const custom = document.getElementById('customAmt') as HTMLInputElement;
-    if (custom && custom.value && parseInt(custom.value) > 0) return parseInt(custom.value);
-    return selectedAmt;
-  }
-
   // UPI modal
   const upiBtn = document.getElementById('upiBtn');
   const modal = document.getElementById('upiModal');
   const modalClose = document.getElementById('modalClose');
   const modalAmt = document.getElementById('modalAmt');
-  const qrImg = document.getElementById('qrImg') as HTMLImageElement;
   const openAppLink = document.getElementById('openAppLink') as HTMLAnchorElement;
+  const copyUpiBtn = document.getElementById('copyUpiBtn');
+  const copyFullBtn = document.getElementById('copyFullBtn');
 
   function openUPI() {
     const amt = getAmt();
@@ -331,17 +459,40 @@ import MainLayout from '../layouts/MainLayout.astro';
       alert('Please select or enter an amount first.');
       return;
     }
-    const vpa = '7211170000@fam';
-    const name = 'The Cinder Project';
-    const upiLink = 'upi://pay?pa=' + encodeURIComponent(vpa) + '&pn=' + encodeURIComponent(name) + '&am=' + amt + '&cu=INR&tn=' + encodeURIComponent('Donation - The Cinder Project');
     if (modalAmt) modalAmt.textContent = '₹' + amt;
-    if (qrImg) qrImg.src = 'data:image/png;base64,' + QR_B64;
-    if (openAppLink) openAppLink.href = upiLink;
+    generateQR(amt);
+    if (openAppLink) openAppLink.href = buildUpiString(amt);
     if (modal) modal.classList.add('open');
   }
 
   function closeModal() {
     if (modal) modal.classList.remove('open');
+  }
+
+  async function copyText(text: string, btn: HTMLElement, label: HTMLElement) {
+    try {
+      await navigator.clipboard.writeText(text);
+      btn.classList.add('copied');
+      if (label) label.textContent = 'Copied!';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        if (label) label.textContent = 'Copy';
+      }, 2000);
+    } catch {
+      // Fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      btn.classList.add('copied');
+      if (label) label.textContent = 'Copied!';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        if (label) label.textContent = 'Copy';
+      }, 2000);
+    }
   }
 
   if (upiBtn) upiBtn.addEventListener('click', openUPI);
@@ -351,8 +502,24 @@ import MainLayout from '../layouts/MainLayout.astro';
       if (e.target === modal) closeModal();
     });
   }
-
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeModal();
   });
+
+  // Copy UPI ID
+  if (copyUpiBtn) {
+    copyUpiBtn.addEventListener('click', () => {
+      const label = document.getElementById('copyLabel');
+      copyText('7211170000@fam', copyUpiBtn, label);
+    });
+  }
+
+  // Copy full UPI payment string
+  if (copyFullBtn) {
+    copyFullBtn.addEventListener('click', () => {
+      const amt = getAmt();
+      const label = copyFullBtn.querySelector('span') || copyFullBtn;
+      copyText(buildUpiString(amt), copyFullBtn, label as HTMLElement);
+    });
+  }
 </script>
