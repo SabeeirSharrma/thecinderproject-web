@@ -1,18 +1,32 @@
 # RECORDED-CHANGES
 
-## 2026-06-27 — Donate Page, install.sh & Trust DB Docs
+## 2026-06-27 — Donate Page, install.sh, Trust DB Docs, TOS & Privacy
 
 ### Donate Page (`/donate`)
 
 - Two-step flow: choose gateway first, then amount (UPI only)
 - **Step 1 — Gateway selection**: UPI or Ko-fi
   - UPI: shows amount selection
-  - Ko-fi: opens `ko-fi.com/thecinderproject` in new tab, shows confirmation with "Return home" button
+  - Ko-fi: opens `ko-fi.com/thecinderproject` in new tab, shows "Opened Ko-fi page in a new tab" confirmation with "Return home" button
 - **Step 2 — Amount (UPI only)**: preset buttons (₹50/100/250/500) + custom input + "Generate QR & payment link" button
 - **UPI modal**: dynamic QR code (qrcodejs), UPI ID copy, full payment string copy, mobile app link
+- Ko-fi icon uses Feather Icons `coffee` SVG
 - Desktop: shows "Copy UPI ID" button; Mobile: triggers native UPI app chooser
 - Responsive layout matching site theme (dark gradient, glass cards, CSS variables)
 - Uses `qrcodejs` library loaded via inline `<script is:inline>` for Astro compatibility
+
+### Terms of Service & Privacy Policy
+
+- New pages at `/tos` and `/privacy`
+- Content stored in `src/content/docs/tos.md` and `src/content/docs/privacy.md`
+- Pages fetch from the existing `docs` content collection and render with legal-page styling
+- TOS covers: acceptance, services, IP, user responsibilities, data collection, disclaimers, liability, third parties, changes
+- Privacy covers: what we don't collect, passive data (Google Fonts, CDNs, Supabase), payments (UPI direct, Ko-fi), data storage, open source transparency
+
+### Footer Updated
+
+- Added "Legal" column with links to Terms of Service and Privacy Policy
+- Grid updated to 5 columns on desktop
 
 ### install.sh Endpoint (`/cpac/install.sh`)
 
@@ -28,7 +42,12 @@
 
 ### Modified Files
 
-- **`src/pages/donate.astro`** — New donate page
+- **`src/pages/donate.astro`** — Donate page with two-step flow, Ko-fi, feather icon
+- **`src/pages/tos.astro`** — Terms of Service page
+- **`src/pages/privacy.astro`** — Privacy Policy page
+- **`src/content/docs/tos.md`** — TOS content
+- **`src/content/docs/privacy.md`** — Privacy Policy content
+- **`src/components/Footer.astro`** — Added Legal column
 - **`public/cpac/install.sh`** — New install script endpoint
 - **`src/pages/cpac-trust-db/docs/index.astro`** — Updated to reflect proxy architecture
 - **`src/content/docs/cpac-trust-db/architecture.md`** — Updated to show worker proxy + fallback
