@@ -38,9 +38,9 @@ CPAC detects suspicious modifications to PKGBUILD build scripts before install o
 
 `cpac audit` scans all installed packages, classifies them by trust tier (Official, ThirdParty, Community, Unknown), and surfaces warnings for low-scoring or unverified packages.
 
-### AUR Support (Opt-in)
+### AUR Support (Enabled by Default)
 
-AUR support is disabled by default. Enable it with `cpac aur enable` to extend search, trust, and install across the Arch User Repository.
+AUR support is enabled by default. Disable it with `cpac config set aur off`.
 
 ### Metadata Cache
 

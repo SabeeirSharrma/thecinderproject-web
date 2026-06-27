@@ -1,5 +1,35 @@
 # RECORDED-CHANGES
 
+## 2026-06-27 — Donate Page, install.sh & Trust DB Docs
+
+### Donate Page (`/donate`)
+
+- New page with dynamic QR code generation for UPI payments (VPA: `7211170000@fam`)
+- Uses `qrcodejs` library loaded via inline `<script is:inline>` for Astro compatibility
+- Desktop: shows "Copy UPI ID" button; Mobile: triggers native UPI app chooser
+- Responsive layout matching site theme (dark gradient, glass cards, CSS variables)
+- QR regenerates on click, shows confirmation toast after 5s
+
+### install.sh Endpoint (`/cpac/install.sh`)
+
+- Transparent build-from-source installer served from `public/cpac/install.sh`
+- Auto-detects Rust, installs temporary toolchain if needed, cleans up via trap
+- Install command: `curl -sSf https://thecinderproject.qd.je/cpac/install.sh | bash`
+
+### cpac-trust-db Docs Page (`/cpac-trust-db/docs`)
+
+- Added via PR #13 (conflicts resolved during merge)
+- Shows architecture, API reference, and integration docs
+- Architecture diagram updated to show Cloudflare Worker proxy as primary, direct Supabase as fallback
+
+### Modified Files
+
+- **`src/pages/donate.astro`** — New donate page
+- **`public/cpac/install.sh`** — New install script endpoint
+- **`src/pages/cpac-trust-db/docs/index.astro`** — Updated to reflect proxy architecture
+- **`src/content/docs/cpac-trust-db/architecture.md`** — Updated to show worker proxy + fallback
+- **`src/content/docs/cpac-trust-db/api.md`** — Updated base URL to `api.thecinderproject.qd.je`
+
 ## 2026-06-22 — Single-Page Docs with Collapsible Sub-Topics
 
 ### What Changed
