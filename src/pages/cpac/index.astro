@@ -21,15 +21,19 @@ import MainLayout from '../../layouts/MainLayout.astro';
           <h2 class="text-2xl font-heading text-white mb-4 uppercase tracking-widest heading-line">Overview</h2>
           <div class="prose prose-invert prose-cinder">
             <p>
-              CPAC is a next-generation package management and deployment solution developed by The Cinder Project. 
-              It aims to bring deterministic builds, reliable dependency resolution, and lightning-fast package 
-              installations to modern systems.
+              CPAC is a package trust layer for Arch-based Linux distributions. 
+              It analyzes packages from both official repositories and the AUR, providing
+              detailed trust scores and security analysis before you install anything.
             </p>
             <p>
-              Whether you're deploying a microservice or building an entire operating system, CPAC gives you the 
-              tools you need to manage software with confidence.
+              CPAC checks community consensus, detects suspicious PKGBUILD patterns,
+              and integrates with the cpac-trust-db for known advisories.
             </p>
           </div>
+          <div class="mt-6 bg-surface p-4 rounded-lg border border-border font-mono text-sm">
+            <code class="text-ember-light">curl -sSf https://thecinderproject.qd.je/cpac/install.sh | bash</code>
+          </div>
+          <p class="text-xs text-muted-text mt-2">Builds from source, installs to /usr/local/bin. No leftover dependencies.</p>
         </section>
 
         <!-- Current Status -->
@@ -52,11 +56,11 @@ import MainLayout from '../../layouts/MainLayout.astro';
           <ul class="space-y-4">
             <li class="border-l-2 border-cinder-mid pl-4 py-1">
               <span class="text-sm text-ember-light font-bold mb-1 block">June 2026</span>
-              <p class="text-muted-text">Initial routing and documentation structure established.</p>
+              <p class="text-muted-text">v0.6.0: Trust DB integration, advisory system, pre-flight checks, Pass 2 anomaly detection.</p>
             </li>
             <li class="border-l-2 border-cinder-mid pl-4 py-1">
-              <span class="text-sm text-ember-light font-bold mb-1 block">May 2026</span>
-              <p class="text-muted-text">Core dependency resolution algorithm prototype completed.</p>
+              <span class="text-sm text-ember-light font-bold mb-1 block">June 2026</span>
+              <p class="text-muted-text">cpac-trust-db launched with Atomic Arch advisory entries.</p>
             </li>
           </ul>
         </section>
@@ -76,13 +80,13 @@ import MainLayout from '../../layouts/MainLayout.astro';
               </a>
             </li>
             <li>
-              <a href="#" class="flex items-center gap-2 text-muted-text hover:text-ember-light transition-colors group">
+              <a href="https://github.com/SabeeirSharrma/cpac" class="flex items-center gap-2 text-muted-text hover:text-ember-light transition-colors group">
                 <span class="text-cinder-mid group-hover:text-ember-core transition-colors">▶</span> Source Code
               </a>
             </li>
             <li>
-              <a href="#" class="flex items-center gap-2 text-muted-text hover:text-ember-light transition-colors group">
-                <span class="text-cinder-mid group-hover:text-ember-core transition-colors">▶</span> Roadmap
+              <a href="https://github.com/SabeeirSharrma/cpac/releases" class="flex items-center gap-2 text-muted-text hover:text-ember-light transition-colors group">
+                <span class="text-cinder-mid group-hover:text-ember-core transition-colors">▶</span> Releases
               </a>
             </li>
           </ul>
