@@ -88,7 +88,7 @@ import MainLayout from '../layouts/MainLayout.astro';
 
       <!-- QR Code (generated dynamically) -->
       <div class="qr-wrap">
-        <canvas id="qrCanvas" width="180" height="180"></canvas>
+        <div id="qrContainer" style="width:180px;height:180px;"></div>
       </div>
 
       <!-- UPI ID with copy -->
@@ -279,6 +279,7 @@ import MainLayout from '../layouts/MainLayout.astro';
     justify-content: center;
   }
   .qr-wrap canvas { display: block; width: 180px; height: 180px; }
+  .qr-wrap img { display: block; width: 180px; height: 180px; }
 
   /* UPI ID row */
   .upi-id-row {
@@ -392,134 +393,123 @@ import MainLayout from '../layouts/MainLayout.astro';
   }
 </style>
 
-<script is:inline src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-<script>
-  let selectedAmt = 500;
-  let qr: any = null;
+<script is:inline>
+  // Load QR library then init
+  (function() {
+    var script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js';
+    script.onload = initDonate;
+    document.head.appendChild(script);
 
-  function buildUpiString(amt: number): string {
-    const vpa = '7211170000@fam';
-    const name = 'The Cinder Project';
-    return `upi://pay?pa=${encodeURIComponent(vpa)}&pn=${encodeURIComponent(name)}&am=${amt}&cu=INR&tn=${encodeURIComponent('Donation - The Cinder Project')}`;
-  }
+    function initDonate() {
+      var selectedAmt = 500;
 
-  function getAmt(): number {
-    const custom = document.getElementById('customAmt') as HTMLInputElement;
-    if (custom && custom.value && parseInt(custom.value) > 0) return parseInt(custom.value);
-    return selectedAmt;
-  }
+      function buildUpiString(amt) {
+        var vpa = '7211170000@fam';
+        var name = 'The Cinder Project';
+        return 'upi://pay?pa=' + encodeURIComponent(vpa) + '&pn=' + encodeURIComponent(name) + '&am=' + amt + '&cu=INR&tn=' + encodeURIComponent('Donation - The Cinder Project');
+      }
 
-  function generateQR(amt: number) {
-    const canvas = document.getElementById('qrCanvas') as HTMLCanvasElement;
-    if (!canvas) return;
-    canvas.innerHTML = '';
-    const upiStr = buildUpiString(amt);
-    qr = new (window as any).QRCode(canvas, {
-      text: upiStr,
-      width: 180,
-      height: 180,
-      colorDark: '#FFFFFF',
-      colorLight: '#111111',
-      correctLevel: (window as any).QRCode.CorrectLevel.M,
-    });
-  }
+      function getAmt() {
+        var custom = document.getElementById('customAmt');
+        if (custom && custom.value && parseInt(custom.value) > 0) return parseInt(custom.value);
+        return selectedAmt;
+      }
 
-  // Amount selection
-  document.querySelectorAll('.amt-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.amt-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      selectedAmt = parseInt(btn.getAttribute('data-amount') || '500');
-      const custom = document.getElementById('customAmt') as HTMLInputElement;
-      if (custom) custom.value = '';
-    });
-  });
+      function generateQR(amt) {
+        var container = document.getElementById('qrContainer');
+        if (!container) return;
+        container.innerHTML = '';
+        try {
+          new QRCode(container, {
+            text: buildUpiString(amt),
+            width: 180,
+            height: 180,
+            colorDark: '#FFFFFF',
+            colorLight: '#111111',
+            correctLevel: QRCode.CorrectLevel.M,
+          });
+        } catch (e) {
+          console.error('QR generation failed:', e);
+          container.innerHTML = '<p style="color:#aaa;text-align:center;font-size:12px;padding:2rem;">QR unavailable</p>';
+        }
+      }
 
-  // Custom amount input
-  const customInput = document.getElementById('customAmt') as HTMLInputElement;
-  if (customInput) {
-    customInput.addEventListener('input', () => {
-      document.querySelectorAll('.amt-btn').forEach(b => b.classList.remove('active'));
-      selectedAmt = parseInt(customInput.value) || 0;
-    });
-  }
+      // Amount buttons
+      document.querySelectorAll('.amt-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.amt-btn').forEach(function(b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          selectedAmt = parseInt(btn.getAttribute('data-amount') || '500');
+          var custom = document.getElementById('customAmt');
+          if (custom) custom.value = '';
+        });
+      });
 
-  // UPI modal
-  const upiBtn = document.getElementById('upiBtn');
-  const modal = document.getElementById('upiModal');
-  const modalClose = document.getElementById('modalClose');
-  const modalAmt = document.getElementById('modalAmt');
-  const openAppLink = document.getElementById('openAppLink') as HTMLAnchorElement;
-  const copyUpiBtn = document.getElementById('copyUpiBtn');
-  const copyFullBtn = document.getElementById('copyFullBtn');
+      // Custom input
+      var customInput = document.getElementById('customAmt');
+      if (customInput) {
+        customInput.addEventListener('input', function() {
+          document.querySelectorAll('.amt-btn').forEach(function(b) { b.classList.remove('active'); });
+          selectedAmt = parseInt(customInput.value) || 0;
+        });
+      }
 
-  function openUPI() {
-    const amt = getAmt();
-    if (!amt || amt < 1) {
-      alert('Please select or enter an amount first.');
-      return;
+      // Modal
+      var upiBtn = document.getElementById('upiBtn');
+      var modal = document.getElementById('upiModal');
+      var modalClose = document.getElementById('modalClose');
+      var modalAmt = document.getElementById('modalAmt');
+      var openAppLink = document.getElementById('openAppLink');
+      var copyUpiBtn = document.getElementById('copyUpiBtn');
+      var copyFullBtn = document.getElementById('copyFullBtn');
+
+      function openUPI() {
+        var amt = getAmt();
+        if (!amt || amt < 1) { alert('Please select or enter an amount first.'); return; }
+        if (modalAmt) modalAmt.textContent = '\u20B9' + amt;
+        generateQR(amt);
+        if (openAppLink) openAppLink.href = buildUpiString(amt);
+        if (modal) modal.classList.add('open');
+      }
+
+      function closeModal() {
+        if (modal) modal.classList.remove('open');
+      }
+
+      function copyText(text, btn, label) {
+        navigator.clipboard.writeText(text).then(function() {
+          btn.classList.add('copied');
+          if (label) label.textContent = 'Copied!';
+          setTimeout(function() { btn.classList.remove('copied'); if (label) label.textContent = 'Copy'; }, 2000);
+        }).catch(function() {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          btn.classList.add('copied');
+          if (label) label.textContent = 'Copied!';
+          setTimeout(function() { btn.classList.remove('copied'); if (label) label.textContent = 'Copy'; }, 2000);
+        });
+      }
+
+      if (upiBtn) upiBtn.addEventListener('click', openUPI);
+      if (modalClose) modalClose.addEventListener('click', closeModal);
+      if (modal) modal.addEventListener('click', function(e) { if (e.target === modal) closeModal(); });
+      document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
+
+      if (copyUpiBtn) {
+        copyUpiBtn.addEventListener('click', function() {
+          copyText('7211170000@fam', copyUpiBtn, document.getElementById('copyLabel'));
+        });
+      }
+      if (copyFullBtn) {
+        copyFullBtn.addEventListener('click', function() {
+          copyText(buildUpiString(getAmt()), copyFullBtn, null);
+        });
+      }
     }
-    if (modalAmt) modalAmt.textContent = '₹' + amt;
-    generateQR(amt);
-    if (openAppLink) openAppLink.href = buildUpiString(amt);
-    if (modal) modal.classList.add('open');
-  }
-
-  function closeModal() {
-    if (modal) modal.classList.remove('open');
-  }
-
-  async function copyText(text: string, btn: HTMLElement, label: HTMLElement) {
-    try {
-      await navigator.clipboard.writeText(text);
-      btn.classList.add('copied');
-      if (label) label.textContent = 'Copied!';
-      setTimeout(() => {
-        btn.classList.remove('copied');
-        if (label) label.textContent = 'Copy';
-      }, 2000);
-    } catch {
-      // Fallback
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      btn.classList.add('copied');
-      if (label) label.textContent = 'Copied!';
-      setTimeout(() => {
-        btn.classList.remove('copied');
-        if (label) label.textContent = 'Copy';
-      }, 2000);
-    }
-  }
-
-  if (upiBtn) upiBtn.addEventListener('click', openUPI);
-  if (modalClose) modalClose.addEventListener('click', closeModal);
-  if (modal) {
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) closeModal();
-    });
-  }
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeModal();
-  });
-
-  // Copy UPI ID
-  if (copyUpiBtn) {
-    copyUpiBtn.addEventListener('click', () => {
-      const label = document.getElementById('copyLabel');
-      copyText('7211170000@fam', copyUpiBtn, label);
-    });
-  }
-
-  // Copy full UPI payment string
-  if (copyFullBtn) {
-    copyFullBtn.addEventListener('click', () => {
-      const amt = getAmt();
-      const label = copyFullBtn.querySelector('span') || copyFullBtn;
-      copyText(buildUpiString(amt), copyFullBtn, label as HTMLElement);
-    });
-  }
+  })();
 </script>
