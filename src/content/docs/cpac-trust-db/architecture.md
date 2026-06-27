@@ -9,32 +9,37 @@ order: 2
 ## Overview
 
 ```
-GitHub (cpac-trust-db repo)
-  Raw TOML files — human-readable, auditable source of truth
-       ↓
-  GitHub Actions (on merge to main)
+CPAC client
+  writes directly to Supabase (snapshots, tokens)
        ↓
   Supabase (Postgres)
   Compiled, queryable database
+  REST API: qzhhsyucnlswmsvpssdh.supabase.co
        ↓
-  thecinderproject.qd.je/cpac-trust-db/api/*
-  Public REST API (proxied through existing domain)
-       ↓
-  CPAC client
+  CPAC client reads (GET advisories, snapshots, meta)
   Local cache at ~/.cpac/trust-db/
+       ↑
+  GitHub Actions (runs nightly)
+  Reads from Supabase → commits updated TOML to repo
 ```
 
 ## Why This Stack
 
-- **GitHub** — source of truth, fully auditable, human-readable TOML diffs on every advisory or snapshot change. Anyone can verify what's in the database.
-- **Supabase (Postgres)** — stable, mature, generous free tier, auto-generated REST API, row-level security handles public read / authenticated write cleanly. Supabase is already in use elsewhere in The Cinder Project stack.
-- **Custom domain proxy** — `thecinderproject.qd.je/cpac-trust-db/api/*` keeps the API endpoint stable regardless of backend changes. If the backend ever moves from Supabase to something else, the URL doesn't change and no CPAC clients break.
+- **Supabase (Postgres)** — stable, mature, generous free tier, auto-generated REST API, row-level security handles public read / authenticated write cleanly. CPAC clients talk directly to Supabase — no proxy or intermediate server.
+- **GitHub** — source of truth, fully auditable, human-readable TOML diffs on every advisory or snapshot change. GitHub Actions reads aggregated data from Supabase and commits updated TOML files on a schedule (nightly). One single commit per run, no overlap possible.
 
 ## Data Flow
 
-1. **Advisories** — Core team merges TOML to `main` → GitHub Actions upserts to Supabase
-2. **Snapshots** — CPAC clients POST to `/api/submit/snapshot` → GitHub Actions aggregates into TOML → commits to repo → syncs to Supabase
-3. **Queries** — CPAC client hits API endpoints → reads from Supabase → caches locally
+1. **Snapshots** — CPAC clients POST directly to Supabase REST API
+2. **Advisories** — Core team merges TOML to `main` → GitHub Actions upserts to Supabase
+3. **Sync** — GitHub Actions runs nightly → reads from Supabase → commits TOML to repo
+4. **Queries** — CPAC client hits Supabase REST API → reads data → caches locally
+
+## No API Proxy
+
+CPAC talks directly to Supabase at `https://qzhhsyucnlswmsvpssdh.supabase.co`. There is no custom domain proxy or中间 layer. The Supabase anon key is embedded in the CPAC client, which is safe because row-level security policies enforce public reads and rate-limited writes only.
+
+A custom domain proxy (e.g. `thecinderproject.qd.je/cpac-trust-db/api/*`) was planned but not implemented — GitHub Pages is static and cannot proxy API requests. If a proxy is needed in the future (e.g. for API key rotation or request logging), it can be added as a Cloudflare Worker without changing the CPAC client architecture.
 
 ---
 

@@ -6,23 +6,27 @@ order: 3
 
 # API Endpoints
 
-All endpoints are public read. Writes require an authenticated token.
+All endpoints are served directly by Supabase REST API. There is no custom domain proxy — CPAC clients talk to Supabase at:
 
-Base URL: `https://thecinderproject.qd.je/cpac-trust-db/api/`
+```
+https://qzhhsyucnlswmsvpssdh.supabase.co
+```
+
+All reads are public (anon key). Writes require an anonymous client token (rate limiting only, not authentication).
 
 ---
 
 ## Meta
 
 ```text
-GET /api/meta
-→ {
+GET /rest/v1/meta?select=*
+→ [{
     version: "abc123",          # hash of current DB state
     updated_at: "2026-06-26T12:00:00Z",
     advisory_count: 12,
     snapshot_package_count: 847,
     schema_version: 1
-  }
+  }]
 ```
 
 Used by CPAC clients to check if their local cache is stale without downloading full data. This is the only request made on every `cpac install`.
@@ -32,11 +36,11 @@ Used by CPAC clients to check if their local cache is stale without downloading 
 ## Advisories
 
 ```text
-GET /api/advisories
+GET /rest/v1/advisories?select=*&order=reported.desc
 → [ ...all advisories... ]
 
-GET /api/advisories/<package-name>
-→ advisory object or 404
+GET /rest/v1/advisories?select=*&package=eq.<package-name>
+→ advisory object or empty array
 ```
 
 ---
@@ -44,31 +48,23 @@ GET /api/advisories/<package-name>
 ## Snapshots
 
 ```text
-GET /api/snapshots/<package-name>
-→ { hashes: [...], pkgbuilds: [...] }
+GET /rest/v1/snapshots?select=*&package=eq.<package-name>
+→ [ ...snapshot entries for a package... ]
 
-GET /api/snapshots/<package-name>/<version>
+GET /rest/v1/snapshots?select=*&package=eq.<package-name>&version=eq.<version>
 → snapshot entries for a specific version
 ```
-
----
-
-## Delta Sync
-
-```text
-GET /api/delta?since=<timestamp>
-→ { advisories: [...changed...], snapshots: [...changed...] }
-```
-
-Used by `cpac update` to pull only records that changed since the last sync, rather than re-downloading the full database every time.
 
 ---
 
 ## Submissions (Authenticated)
 
 ```text
-POST /api/submit/snapshot
-Authorization: Bearer <token>
+POST /rest/v1/snapshots
+Authorization: Bearer <anon-key>
+X-Client-Token: <anonymous-token>
+Content-Type: application/json
+
 → Submit a PKGBUILD hash or full sanitized PKGBUILD
 ```
 
