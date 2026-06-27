@@ -20,16 +20,67 @@ import MainLayout from '../layouts/MainLayout.astro';
       </p>
     </header>
 
-    <!-- Amount Selection -->
-    <section class="mb-8 reveal">
-      <label class="block text-xs font-bold tracking-widest uppercase text-muted-text mb-3">Choose an amount</label>
+    <!-- Step 1: Choose Gateway -->
+    <section class="mb-8 reveal" id="stepGateway">
+      <label class="block text-xs font-bold tracking-widest uppercase text-muted-text mb-3">Choose a payment method</label>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+        <button class="gw-btn" id="upiSelect">
+          <div class="gw-icon upi">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M4 11L11 4L18 11L11 18L4 11Z" fill="#00B9F1" opacity="0.9"/>
+              <path d="M8 11L11 8L14 11L11 14L8 11Z" fill="#fff" opacity="0.9"/>
+            </svg>
+          </div>
+          <div class="gw-name">UPI (India)</div>
+          <div class="gw-sub">GPay, PhonePe, Paytm, any UPI app</div>
+        </button>
+
+        <button class="gw-btn" id="kofiSelect">
+          <div class="gw-icon kofi">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M3 8C3 8 3 14 6 14C8 14 8.5 12 9 10.5C9.5 9 10 8 11 8C12 8 12.5 9 13 10.5C13.5 12 14 14 16 14C19 14 19 8 19 8" stroke="#FF5E5B" stroke-width="2" stroke-linecap="round"/>
+              <path d="M11 6V8" stroke="#FF5E5B" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="gw-name">Ko-fi (Global)</div>
+          <div class="gw-sub">Cards, PayPal, Apple Pay &amp; more</div>
+        </button>
+
+      </div>
+    </section>
+
+    <!-- Ko-fi confirmation (hidden by default) -->
+    <section class="mb-8 hidden text-center" id="stepKofi">
+      <div class="kofi-confirm">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-3">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        <p class="text-lg text-white font-heading mb-1">Opened Ko-fi page in a new tab</p>
+        <p class="text-sm text-muted-text mb-6">Complete your donation there, then come back anytime.</p>
+        <a href="/" class="return-home-btn">Return home</a>
+      </div>
+    </section>
+
+    <!-- Step 2: Amount (UPI only, hidden by default) -->
+    <section class="mb-8 hidden" id="stepAmount">
+      <div class="flex items-center justify-between mb-3">
+        <label class="block text-xs font-bold tracking-widest uppercase text-muted-text">Enter amount</label>
+        <button class="back-btn" id="backBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Back
+        </button>
+      </div>
       <div class="grid grid-cols-4 gap-2 mb-3">
         <button class="amt-btn" data-amount="50">₹50</button>
         <button class="amt-btn" data-amount="100">₹100</button>
         <button class="amt-btn" data-amount="250">₹250</button>
         <button class="amt-btn active" data-amount="500">₹500</button>
       </div>
-      <div class="relative">
+      <div class="relative mb-4">
         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-muted-text pointer-events-none">₹</span>
         <input
           class="custom-input"
@@ -39,36 +90,9 @@ import MainLayout from '../layouts/MainLayout.astro';
           min="1"
         />
       </div>
-    </section>
-
-    <!-- Payment Gateway -->
-    <section class="mb-8 reveal stagger-1">
-      <label class="block text-xs font-bold tracking-widest uppercase text-muted-text mb-3">Pay with</label>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-
-        <button class="gw-btn" id="upiBtn">
-          <div class="gw-icon upi">
-            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-              <path d="M4 11L11 4L18 11L11 18L4 11Z" fill="#00B9F1" opacity="0.9"/>
-              <path d="M8 11L11 8L14 11L11 14L8 11Z" fill="#fff" opacity="0.9"/>
-            </svg>
-          </div>
-          <div class="gw-name">UPI</div>
-          <div class="gw-sub">GPay, PhonePe, Paytm, any UPI app</div>
-        </button>
-
-        <button class="gw-btn opacity-50 cursor-default" disabled>
-          <div class="gw-icon rzp">
-            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-              <path d="M6 16L10 6H14L16 16H13L12.5 13.5H9.5L9 16H6Z" fill="#1D63FF"/>
-              <path d="M10 11.5L10.5 8.5H11.5L12 11.5H10Z" fill="#fff" opacity="0.6"/>
-            </svg>
-          </div>
-          <div class="gw-name">Other options (via RazorPay)</div>
-          <div class="gw-sub">Cards &amp; netbanking — coming soon</div>
-        </button>
-
-      </div>
+      <button class="generate-btn" id="generateBtn">
+        Generate QR &amp; payment link
+      </button>
     </section>
 
     <!-- Footer Note -->
@@ -199,7 +223,7 @@ import MainLayout from '../layouts/MainLayout.astro';
     justify-content: center;
     margin-bottom: 2px;
   }
-  .gw-icon.rzp { background: rgba(29, 99, 255, 0.09); }
+  .gw-icon.kofi { background: rgba(255, 94, 91, 0.09); }
   .gw-icon.upi { background: rgba(0, 185, 241, 0.09); }
   .gw-name {
     font-size: 14px;
@@ -213,6 +237,43 @@ import MainLayout from '../layouts/MainLayout.astro';
     color: var(--color-muted-text);
     line-height: 1.3;
   }
+
+  /* Back button */
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: var(--color-muted-text);
+    cursor: pointer;
+    font-size: 12px;
+    font-family: var(--font-body);
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.15s;
+  }
+  .back-btn:hover {
+    color: var(--color-ember-core);
+    background: rgba(255, 69, 0, 0.08);
+  }
+
+  /* Generate button */
+  .generate-btn {
+    width: 100%;
+    background: var(--color-ember-core);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: var(--font-heading);
+    letter-spacing: 0.05em;
+    padding: 0.85rem;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .generate-btn:hover { background: var(--color-ember-deep); }
 
   /* Modal */
   .modal-overlay {
@@ -388,13 +449,40 @@ import MainLayout from '../layouts/MainLayout.astro';
     .open-app-btn { display: none; }
   }
 
+  .hidden { display: none !important; }
+
+  /* Ko-fi confirmation */
+  .kofi-confirm {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .return-home-btn {
+    display: inline-block;
+    background: var(--color-ember-core);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: var(--font-heading);
+    letter-spacing: 0.05em;
+    padding: 0.85rem 2rem;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .return-home-btn:hover { background: var(--color-ember-deep); }
+
   @media (max-width: 480px) {
     .gw-btn { grid-column: span 1; }
   }
 </style>
 
 <script is:inline>
-  // Load QR library then init
   (function() {
     var script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js';
@@ -435,6 +523,37 @@ import MainLayout from '../layouts/MainLayout.astro';
         }
       }
 
+      // Gateway selection
+      var upiSelect = document.getElementById('upiSelect');
+      var kofiSelect = document.getElementById('kofiSelect');
+      var stepGateway = document.getElementById('stepGateway');
+      var stepAmount = document.getElementById('stepAmount');
+      var stepKofi = document.getElementById('stepKofi');
+      var backBtn = document.getElementById('backBtn');
+      var generateBtn = document.getElementById('generateBtn');
+
+      if (upiSelect) {
+        upiSelect.addEventListener('click', function() {
+          stepGateway.classList.add('hidden');
+          stepAmount.classList.remove('hidden');
+        });
+      }
+
+      if (kofiSelect) {
+        kofiSelect.addEventListener('click', function() {
+          window.open('https://ko-fi.com/thecinderproject', '_blank', 'noopener,noreferrer');
+          stepGateway.classList.add('hidden');
+          stepKofi.classList.remove('hidden');
+        });
+      }
+
+      if (backBtn) {
+        backBtn.addEventListener('click', function() {
+          stepAmount.classList.add('hidden');
+          stepGateway.classList.remove('hidden');
+        });
+      }
+
       // Amount buttons
       document.querySelectorAll('.amt-btn').forEach(function(btn) {
         btn.addEventListener('click', function() {
@@ -455,23 +574,26 @@ import MainLayout from '../layouts/MainLayout.astro';
         });
       }
 
-      // Modal
-      var upiBtn = document.getElementById('upiBtn');
+      // Generate button → open modal
+      if (generateBtn) {
+        generateBtn.addEventListener('click', function() {
+          var amt = getAmt();
+          if (!amt || amt < 1) { alert('Please select or enter an amount.'); return; }
+          var modal = document.getElementById('upiModal');
+          var modalAmt = document.getElementById('modalAmt');
+          var openAppLink = document.getElementById('openAppLink');
+          if (modalAmt) modalAmt.textContent = '\u20B9' + amt;
+          generateQR(amt);
+          if (openAppLink) openAppLink.href = buildUpiString(amt);
+          if (modal) modal.classList.add('open');
+        });
+      }
+
+      // Modal close
       var modal = document.getElementById('upiModal');
       var modalClose = document.getElementById('modalClose');
-      var modalAmt = document.getElementById('modalAmt');
-      var openAppLink = document.getElementById('openAppLink');
       var copyUpiBtn = document.getElementById('copyUpiBtn');
       var copyFullBtn = document.getElementById('copyFullBtn');
-
-      function openUPI() {
-        var amt = getAmt();
-        if (!amt || amt < 1) { alert('Please select or enter an amount first.'); return; }
-        if (modalAmt) modalAmt.textContent = '\u20B9' + amt;
-        generateQR(amt);
-        if (openAppLink) openAppLink.href = buildUpiString(amt);
-        if (modal) modal.classList.add('open');
-      }
 
       function closeModal() {
         if (modal) modal.classList.remove('open');
@@ -495,7 +617,6 @@ import MainLayout from '../layouts/MainLayout.astro';
         });
       }
 
-      if (upiBtn) upiBtn.addEventListener('click', openUPI);
       if (modalClose) modalClose.addEventListener('click', closeModal);
       if (modal) modal.addEventListener('click', function(e) { if (e.target === modal) closeModal(); });
       document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });

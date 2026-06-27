@@ -4,11 +4,15 @@
 
 ### Donate Page (`/donate`)
 
-- New page with dynamic QR code generation for UPI payments (VPA: `7211170000@fam`)
-- Uses `qrcodejs` library loaded via inline `<script is:inline>` for Astro compatibility
+- Two-step flow: choose gateway first, then amount (UPI only)
+- **Step 1 — Gateway selection**: UPI or Ko-fi
+  - UPI: shows amount selection
+  - Ko-fi: opens `ko-fi.com/thecinderproject` in new tab, shows confirmation with "Return home" button
+- **Step 2 — Amount (UPI only)**: preset buttons (₹50/100/250/500) + custom input + "Generate QR & payment link" button
+- **UPI modal**: dynamic QR code (qrcodejs), UPI ID copy, full payment string copy, mobile app link
 - Desktop: shows "Copy UPI ID" button; Mobile: triggers native UPI app chooser
 - Responsive layout matching site theme (dark gradient, glass cards, CSS variables)
-- QR regenerates on click, shows confirmation toast after 5s
+- Uses `qrcodejs` library loaded via inline `<script is:inline>` for Astro compatibility
 
 ### install.sh Endpoint (`/cpac/install.sh`)
 
