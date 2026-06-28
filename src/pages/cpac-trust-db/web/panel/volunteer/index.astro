@@ -428,10 +428,9 @@ import MainLayout from '../../../../../layouts/MainLayout.astro';
 
   <script is:inline>
     (function() {
-      var WORKER_BASE = 'https://api.thecinderproject.qd.je';
-      var API_PREFIX = WORKER_BASE + '/cpac-trust-db/api';
       var SUPABASE_URL = 'https://qzhhsyucnlswmsvpssdh.supabase.co';
       var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6aGhzeXVjbmxzd21zdnBzc2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0NzE1NDQsImV4cCI6MjA5ODA0NzU0NH0.sIQobt0xfnMsgthGLJUb1S8f1yisDcavtRoWzi7y4OA';
+      var WORKER_URL = 'https://cpac-trust-db-api.sabplay-idk.workers.dev';
       var supabase = null;
       var currentUser = null;
       var currentSession = null;
@@ -562,11 +561,11 @@ import MainLayout from '../../../../../layouts/MainLayout.astro';
 
         try {
           // Fetch all snapshots (unique packages)
-          var snapRes = await fetch(API_PREFIX + '/snapshots?select=package,version,created_at&order=created_at.desc&limit=500', { headers: anonHeaders() });
+          var snapRes = await fetch(SUPABASE_URL + '/rest/v1/snapshots?select=package,version,created_at&order=created_at.desc&limit=500', { headers: anonHeaders() });
           var snaps = await snapRes.json();
 
           // Fetch all advisories
-          var advRes = await fetch(API_PREFIX + '/advisories?select=package,version,reported', { headers: anonHeaders() });
+          var advRes = await fetch(SUPABASE_URL + '/rest/v1/advisories?select=package,version,reported', { headers: anonHeaders() });
           var advs = await advRes.json();
           var advMap = {};
           advs.forEach(function(a) { advMap[a.package] = a; });
@@ -700,11 +699,11 @@ import MainLayout from '../../../../../layouts/MainLayout.astro';
 
         try {
           // Fetch snapshots
-          var snapRes = await fetch(API_PREFIX + '/snapshots?select=*&package=eq.' + encodeURIComponent(pkgName) + '&order=version.desc', { headers: anonHeaders() });
+          var snapRes = await fetch(SUPABASE_URL + '/rest/v1/snapshots?select=*&package=eq.' + encodeURIComponent(pkgName) + '&order=version.desc', { headers: anonHeaders() });
           currentSnapshots = await snapRes.json();
 
           // Fetch AUR info
-          var aurRes = await fetch(API_PREFIX + '/aur/info/' + encodeURIComponent(pkgName));
+          var aurRes = await fetch(WORKER_URL + '/cpac-trust-db/api/aur/info/' + encodeURIComponent(pkgName));
           var aurData = await aurRes.json();
 
           if (aurData.resultcount === 0 && currentSnapshots.length === 0) {
@@ -756,7 +755,7 @@ import MainLayout from '../../../../../layouts/MainLayout.astro';
           var suspicious = detectSuspicious(newText || '');
 
           // Check advisories
-          var advRes2 = await fetch(API_PREFIX + '/advisories?select=*&package=eq.' + encodeURIComponent(pkgName), { headers: anonHeaders() });
+          var advRes2 = await fetch(SUPABASE_URL + '/rest/v1/advisories?select=*&package=eq.' + encodeURIComponent(pkgName), { headers: anonHeaders() });
           var advisories = await advRes2.json();
           var advisory = advisories.length > 0 ? advisories[0] : null;
 
@@ -791,7 +790,7 @@ import MainLayout from '../../../../../layouts/MainLayout.astro';
         if (snap && snap.pkgbuild_text) return snap.pkgbuild_text;
         if (data.aurInfo && data.aurInfo.Version === version) {
           try {
-            var res = await fetch(API_PREFIX + '/aur/pkgbuild/' + encodeURIComponent(pkg));
+            var res = await fetch(WORKER_URL + '/cpac-trust-db/api/aur/pkgbuild/' + encodeURIComponent(pkg));
             var text = await res.text();
             if (text && text.length > 10 && text.indexOf('#') !== -1) return text;
           } catch(e) {}
@@ -965,7 +964,7 @@ import MainLayout from '../../../../../layouts/MainLayout.astro';
         try {
           var diffHash = await sha256((oldText || '') + '---' + (newText || ''));
 
-          var cacheRes = await fetch(API_PREFIX + '/ai_analysis?select=*&package=eq.' + encodeURIComponent(selectedPkg)
+          var cacheRes = await fetch(SUPABASE_URL + '/rest/v1/ai_analysis?select=*&package=eq.' + encodeURIComponent(selectedPkg)
             + '&version_old=eq.' + encodeURIComponent(vOld)
             + '&version_new=eq.' + encodeURIComponent(vNew)
             + '&diff_hash=eq.' + diffHash
@@ -987,7 +986,7 @@ import MainLayout from '../../../../../layouts/MainLayout.astro';
           var analysis = 'AI analysis is not yet connected. This feature requires an AI provider API key to be configured on the backend.';
           var recommendation = 'suspicious';
 
-          await fetch(API_PREFIX + '/ai_analysis', {
+          await fetch(SUPABASE_URL + '/rest/v1/ai_analysis', {
             method: 'POST',
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
             body: JSON.stringify({
