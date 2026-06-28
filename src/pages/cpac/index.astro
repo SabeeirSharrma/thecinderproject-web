@@ -1,5 +1,21 @@
 ---
 import MainLayout from '../../layouts/MainLayout.astro';
+
+// Fetch latest releases from GitHub
+let releases: { tag: string; date: string; name: string; url: string; prerelease: boolean }[] = [];
+try {
+  const res = await fetch('https://api.github.com/repos/SabeeirSharrma/cpac/releases?per_page=3');
+  if (res.ok) {
+    const data = await res.json();
+    releases = data.map((r: any) => ({
+      tag: r.tag_name,
+      date: new Date(r.published_at || r.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+      name: r.name || r.tag_name,
+      url: r.html_url,
+      prerelease: r.prerelease,
+    }));
+  }
+} catch {}
 ---
 
 <MainLayout title="CPAC">
@@ -49,16 +65,22 @@ import MainLayout from '../../layouts/MainLayout.astro';
         <!-- Recent Updates -->
         <section class="reveal stagger-2">
           <h2 class="text-2xl font-heading text-white mb-4 uppercase tracking-widest heading-line">Recent Updates</h2>
-          <ul class="space-y-4">
-            <li class="border-l-2 border-cinder-mid pl-4 py-1">
-              <span class="text-sm text-ember-light font-bold mb-1 block">June 2026</span>
-              <p class="text-muted-text">v0.6.0: Trust DB integration, advisory system, pre-flight checks, Pass 2 anomaly detection.</p>
-            </li>
-            <li class="border-l-2 border-cinder-mid pl-4 py-1">
-              <span class="text-sm text-ember-light font-bold mb-1 block">June 2026</span>
-              <p class="text-muted-text">cpac-trust-db launched with Atomic Arch advisory entries.</p>
-            </li>
-          </ul>
+          {releases.length > 0 ? (
+            <ul class="space-y-4">
+              {releases.map((r) => (
+                <li class="border-l-2 border-cinder-mid pl-4 py-1">
+                  <span class="text-sm text-ember-light font-bold mb-1 block">{r.date}</span>
+                  <p class="text-muted-text">
+                    {r.name}
+                    {r.prerelease && <span class="text-xs text-cinder-mid ml-1">(pre-release)</span>}
+                    — <a href={r.url} target="_blank" rel="noopener noreferrer" class="text-ember-core hover:underline">View on GitHub</a>
+                  </p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p class="text-muted-text">No releases yet.</p>
+          )}
         </section>
 
       </div>
