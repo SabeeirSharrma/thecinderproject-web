@@ -583,8 +583,10 @@ import MainLayout from '../../../../../layouts/MainLayout.astro';
           var snaps = await snapRes.json();
           var advRes = await fetch(SUPABASE_URL + '/rest/v1/advisories?select=package,version,reported', { headers: anonHeaders() });
           var advs = await advRes.json();
+          if (!Array.isArray(advs)) advs = [];
           var advMap = {}; advs.forEach(function(a) { advMap[a.package] = a; });
           var pkgMap = {};
+          if (!Array.isArray(snaps)) snaps = [];
           snaps.forEach(function(s) { if (!pkgMap[s.package]) pkgMap[s.package] = { name: s.package, latestVersion: s.version, latestDate: s.created_at, hasAdvisory: false, advisoryVersion: null }; });
           Object.keys(advMap).forEach(function(pkg) { if (pkgMap[pkg]) { pkgMap[pkg].hasAdvisory = true; pkgMap[pkg].advisoryVersion = advMap[pkg].version; } });
           allPackages = Object.values(pkgMap).filter(function(p) { return !p.hasAdvisory || p.advisoryVersion !== p.latestVersion; })
