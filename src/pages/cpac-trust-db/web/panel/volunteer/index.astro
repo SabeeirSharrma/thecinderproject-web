@@ -799,6 +799,14 @@ import MainLayout from '../../../../../layouts/MainLayout.astro';
             if (text && text.length > 10 && text.indexOf('#') !== -1) return text;
           } catch(e) {}
         }
+        // Fallback: fetch from Arch GitLab via Worker proxy for official packages
+        try {
+          var glRes = await fetch(WORKER_URL + '/cpac-trust-db/api/official/pkgbuild/' + encodeURIComponent(pkg));
+          if (glRes.ok) {
+            var text = await glRes.text();
+            if (text && text.length > 10 && text.indexOf('#') !== -1) return text;
+          }
+        } catch(e) {}
         return null;
       }
 
