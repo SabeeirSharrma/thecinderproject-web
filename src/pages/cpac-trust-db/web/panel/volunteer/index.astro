@@ -567,7 +567,7 @@ import MainLayout from '../../../../../layouts/MainLayout.astro';
           var snaps = await snapRes.json();
 
           // Fetch all advisories
-          var advRes = await fetch(SUPABASE_URL + '/rest/v1/advisories?select=package,version,reported', { headers: anonHeaders() });
+          var advRes = await fetch(SUPABASE_URL + '/rest/v1/advisories?select=package,safe_versions', { headers: anonHeaders() });
           var advs = await advRes.json();
           if (!Array.isArray(advs)) advs = [];
           var advMap = {};
@@ -578,21 +578,23 @@ import MainLayout from '../../../../../layouts/MainLayout.astro';
           if (!Array.isArray(snaps)) snaps = [];
           snaps.forEach(function(s) {
             if (!pkgMap[s.package]) {
-              pkgMap[s.package] = { name: s.package, latestVersion: s.version, latestDate: s.created_at, hasAdvisory: false, advisoryVersion: null };
+              pkgMap[s.package] = { name: s.package, latestVersion: s.version, latestDate: s.created_at, hasAdvisory: false, isCovered: false };
             }
           });
 
-          // Mark packages with advisories
+          // Mark packages with advisories — check if latest version is in safe_versions
           Object.keys(advMap).forEach(function(pkg) {
             if (pkgMap[pkg]) {
               pkgMap[pkg].hasAdvisory = true;
-              pkgMap[pkg].advisoryVersion = advMap[pkg].version;
+              var sv = advMap[pkg].safe_versions || [];
+              if (typeof sv === 'string') { try { sv = JSON.parse(sv); } catch(e) { sv = []; } }
+              pkgMap[pkg].isCovered = Array.isArray(sv) && sv.indexOf(pkgMap[pkg].latestVersion) !== -1;
             }
           });
 
-          // Filter: packages without advisory OR advisory is for older version
+          // Filter: packages without advisory OR advisory doesn't cover latest version
           allPackages = Object.values(pkgMap).filter(function(p) {
-            return !p.hasAdvisory || p.advisoryVersion !== p.latestVersion;
+            return !p.hasAdvisory || !p.isCovered;
           }).map(function(p) {
             return {
               name: p.name,
@@ -1107,8 +1109,9 @@ import MainLayout from '../../../../../layouts/MainLayout.astro';
           };
 
           try {
-            var res = await fetch(SUPABASE_URL + '/rest/v1/pending_advisories', { method: 'POST', headers: authHeaders(), body: JSON.stringify(body) });
-            var data = await res.json();
+            var hdrs = authHeaders(); hdrs['Prefer'] = 'return=representation';
+            var res = await fetch(SUPABASE_URL + '/rest/v1/pending_advisories', { method: 'POST', headers: hdrs, body: JSON.stringify(body) });
+            var txt = await res.text(); var data = txt ? JSON.parse(txt) : {};
             if (res.ok) {
               successEl.textContent = 'Advisory submitted for review.';
               successEl.classList.remove('hidden');
@@ -1119,7 +1122,7 @@ import MainLayout from '../../../../../layouts/MainLayout.astro';
               loadSubmissions();
               loadPackagesNeedingReview();
             } else {
-              errorEl.textContent = data.message || data.error || 'Submission failed.';
+              errorEl.textContent = data.message || data.error || 'Submission failed (status ' + res.status + ').';
               errorEl.classList.remove('hidden');
             }
           } catch(err) {

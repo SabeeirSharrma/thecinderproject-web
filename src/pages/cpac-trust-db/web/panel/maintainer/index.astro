@@ -547,7 +547,7 @@ import MainLayout from '../../../../../layouts/MainLayout.astro';
         try {
           var snapRes = await fetch(SUPABASE_URL + '/rest/v1/snapshots?select=package,version,created_at&order=created_at.desc&limit=500', { headers: anonHeaders() });
           var snaps = await snapRes.json();
-          var advRes = await fetch(SUPABASE_URL + '/rest/v1/advisories?select=package,version,reported', { headers: anonHeaders() });
+          var advRes = await fetch(SUPABASE_URL + '/rest/v1/advisories?select=package,safe_versions', { headers: anonHeaders() });
           var advs = await advRes.json();
           if (!Array.isArray(advs)) advs = [];
           var advMap = {};
@@ -557,15 +557,20 @@ import MainLayout from '../../../../../layouts/MainLayout.astro';
           if (!Array.isArray(snaps)) snaps = [];
           snaps.forEach(function(s) {
             if (!pkgMap[s.package]) {
-              pkgMap[s.package] = { name: s.package, latestVersion: s.version, latestDate: s.created_at, hasAdvisory: false, advisoryVersion: null };
+              pkgMap[s.package] = { name: s.package, latestVersion: s.version, latestDate: s.created_at, hasAdvisory: false, isCovered: false };
             }
           });
           Object.keys(advMap).forEach(function(pkg) {
-            if (pkgMap[pkg]) { pkgMap[pkg].hasAdvisory = true; pkgMap[pkg].advisoryVersion = advMap[pkg].version; }
+            if (pkgMap[pkg]) {
+              pkgMap[pkg].hasAdvisory = true;
+              var sv = advMap[pkg].safe_versions || [];
+              if (typeof sv === 'string') { try { sv = JSON.parse(sv); } catch(e) { sv = []; } }
+              pkgMap[pkg].isCovered = Array.isArray(sv) && sv.indexOf(pkgMap[pkg].latestVersion) !== -1;
+            }
           });
 
           allPackages = Object.values(pkgMap).filter(function(p) {
-            return !p.hasAdvisory || p.advisoryVersion !== p.latestVersion;
+            return !p.hasAdvisory || !p.isCovered;
           }).map(function(p) {
             return { name: p.name, latestVersion: p.latestVersion, latestDate: p.latestDate, status: p.hasAdvisory ? 'stale' : 'none' };
           }).sort(function(a, b) { return a.name.localeCompare(b.name); });
@@ -851,12 +856,12 @@ import MainLayout from '../../../../../layouts/MainLayout.astro';
           errorEl.classList.add('hidden'); successEl.classList.add('hidden');
           btn.textContent = 'Submitting...'; btn.disabled = true;
           var cs = function(v) { return v ? v.split(',').map(function(s) { return s.trim(); }).filter(Boolean) : []; };
-          var body = { submitted_by: currentUser.id, package: document.getElementById('f-package' + suffix).value.trim(), severity: document.getElementById('f-severity' + suffix).value, status: document.getElementById('f-status' + suffix).value, summary: document.getElementById('f-summary' + suffix).value.trim(), description: document.getElementById('f-description' + suffix).value.trim(), affected_versions: JSON.stringify(cs(document.getElementById('f-affected' + suffix).value)), safe_versions: JSON.stringify(cs(document.getElementById('f-safe' + suffix).value)), reference_urls: JSON.stringify(cs(document.getElementById('f-urls' + suffix).value)), cve: document.getElementById('f-cve' + suffix).value.trim() };
+          var body = { p_package: document.getElementById('f-package' + suffix).value.trim(), p_severity: document.getElementById('f-severity' + suffix).value, p_status: document.getElementById('f-status' + suffix).value, p_summary: document.getElementById('f-summary' + suffix).value.trim(), p_description: document.getElementById('f-description' + suffix).value.trim(), p_affected_versions: JSON.stringify(cs(document.getElementById('f-affected' + suffix).value)), p_safe_versions: JSON.stringify(cs(document.getElementById('f-safe' + suffix).value)), p_reference_urls: JSON.stringify(cs(document.getElementById('f-urls' + suffix).value)), p_cve: document.getElementById('f-cve' + suffix).value.trim() };
           try {
-            var res = await fetch(SUPABASE_URL + '/rest/v1/pending_advisories', { method: 'POST', headers: authHeaders(), body: JSON.stringify(body) });
-            var data = await res.json();
-            if (res.ok) { successEl.textContent = 'Advisory submitted.'; successEl.classList.remove('hidden'); document.getElementById('publish-form' + suffix).reset(); if (selectedPkg) localStorage.removeItem('cpac-notes-' + selectedPkg); loadPackagesNeedingReview(); }
-            else { errorEl.textContent = data.message || data.error || 'Failed.'; errorEl.classList.remove('hidden'); }
+            var res = await fetch(SUPABASE_URL + '/rest/v1/rpc/direct_publish_advisory', { method: 'POST', headers: authHeaders(), body: JSON.stringify(body) });
+            var txt = await res.text(); var data = txt ? JSON.parse(txt) : {};
+            if (res.ok) { successEl.textContent = 'Advisory published directly.'; successEl.classList.remove('hidden'); document.getElementById('publish-form' + suffix).reset(); if (selectedPkg) localStorage.removeItem('cpac-notes-' + selectedPkg); loadPublished(); loadStats(); loadPackagesNeedingReview(); }
+            else { errorEl.textContent = data.message || data.error || 'Failed (status ' + res.status + ').'; errorEl.classList.remove('hidden'); }
           } catch(err) { errorEl.textContent = 'Network error: ' + err.message; errorEl.classList.remove('hidden'); }
           btn.textContent = 'Submit Advisory'; btn.disabled = false;
         });
@@ -866,7 +871,7 @@ import MainLayout from '../../../../../layouts/MainLayout.astro';
       // ── Load pending ──
       function loadPending() {
         fetch(SUPABASE_URL + '/rest/v1/pending_advisories?select=*,profiles:submitted_by(display_name)&review_status=eq.pending&order=created_at.asc', {
-          headers: anonHeaders()
+          headers: authHeaders()
         }).then(function(r) { return r.json(); }).then(function(data) {
           document.getElementById('pending-loading').classList.add('hidden');
           document.getElementById('pending-count').textContent = data.length;
@@ -917,7 +922,7 @@ import MainLayout from '../../../../../layouts/MainLayout.astro';
 
       // ── Load published ──
       function loadPublished() {
-        fetch(SUPABASE_URL + '/rest/v1/advisories?select=*&order=reported.desc', { headers: anonHeaders() })
+        fetch(SUPABASE_URL + '/rest/v1/advisories?select=*&order=updated.desc', { headers: anonHeaders() })
           .then(function(r) { return r.json(); }).then(function(data) {
             document.getElementById('published-loading').classList.add('hidden');
             document.getElementById('published-list').innerHTML = data.map(function(a) {
