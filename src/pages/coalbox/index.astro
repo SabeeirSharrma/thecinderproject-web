@@ -1,0 +1,171 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+
+// Fetch latest releases from GitHub
+let releases: { tag: string; date: string; name: string; url: string; prerelease: boolean }[] = [];
+try {
+  const res = await fetch('https://api.github.com/repos/SabeeirSharrma/CoalBox/releases?per_page=3');
+  if (res.ok) {
+    const data = await res.json();
+    releases = data.map((r: any) => ({
+      tag: r.tag_name,
+      date: new Date(r.published_at || r.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+      name: r.name || r.tag_name,
+      url: r.html_url,
+      prerelease: r.prerelease,
+    }));
+  }
+} catch {}
+---
+
+<MainLayout title="CoalBox" description="Local-first, open-format password manager.">
+  <div class="container mx-auto px-4 py-16 max-w-4xl">
+    
+    <!-- Header -->
+    <header class="mb-16 border-b border-border pb-8">
+      <h1 class="text-5xl md:text-6xl font-heading text-white mb-4 uppercase tracking-widest anim-slide-up">CoalBox</h1>
+      <p class="text-2xl text-ember-core font-heading tracking-wide anim-slide-up delay-2">Local-first, open-format password manager.</p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+      
+      <!-- Main Content Area -->
+      <div class="md:col-span-2 space-y-12">
+        
+        <!-- Overview -->
+        <section class="reveal">
+          <h2 class="text-2xl font-heading text-white mb-4 uppercase tracking-widest heading-line">Overview</h2>
+          <div class="prose prose-invert prose-cinder">
+            <p>
+              CoalBox is a password manager that runs entirely on your local machine. 
+              It stores your credentials in a single encrypted <code class="text-ember-light bg-card px-1.5 py-0.5 rounded text-xs">.emberkeys</code> file 
+              that you control. No cloud service, no subscription, no vendor lock-in.
+            </p>
+            <p>
+              Your vault lives on your machine. No account, no server, no internet required. 
+              The <code class="text-ember-light bg-card px-1.5 py-0.5 rounded text-xs">.emberkeys</code> format is fully documented and open — 
+              you are never locked in.
+            </p>
+          </div>
+          <p class="text-xs text-muted-text mt-2">Builds from source, installs to /usr/local/bin. No leftover dependencies. How to install: <a href="/coalbox/docs">Documentation</a></p>
+        </section>
+
+        <!-- Key Features -->
+        <section class="reveal stagger-1">
+          <h2 class="text-2xl font-heading text-white mb-4 uppercase tracking-widest heading-line">Key Features</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="bg-surface p-5 rounded-lg border border-border">
+              <h3 class="text-white font-bold tracking-wider mb-2">Vault Management</h3>
+              <p class="text-muted-text text-sm">AES-256-GCM encryption with Argon2id key derivation. Auto-lock after configurable inactivity.</p>
+            </div>
+            <div class="bg-surface p-5 rounded-lg border border-border">
+              <h3 class="text-white font-bold tracking-wider mb-2">Entry Types</h3>
+              <p class="text-muted-text text-sm">Login, Authenticator, Secure Note, Payment Card, and Identity entries with custom fields.</p>
+            </div>
+            <div class="bg-surface p-5 rounded-lg border border-border">
+              <h3 class="text-white font-bold tracking-wider mb-2">Password Generator</h3>
+              <p class="text-muted-text text-sm">Character mode and passphrase mode with EFF large wordlist (7776 words).</p>
+            </div>
+            <div class="bg-surface p-5 rounded-lg border border-border">
+              <h3 class="text-white font-bold tracking-wider mb-2">Import / Export</h3>
+              <p class="text-muted-text text-sm">Import from CSV, Bitwarden JSON, KeePass XML, 1Password 1PUX. Export to plaintext JSON.</p>
+            </div>
+            <div class="bg-surface p-5 rounded-lg border border-border">
+              <h3 class="text-white font-bold tracking-wider mb-2">TOTP & Breach Checking</h3>
+              <p class="text-muted-text text-sm">TOTP code generation (RFC 6238) and HaveIBeenPwned breach checking via k-anonymity.</p>
+            </div>
+            <div class="bg-surface p-5 rounded-lg border border-border">
+              <h3 class="text-white font-bold tracking-wider mb-2">WebUI</h3>
+              <p class="text-muted-text text-sm">Redesigned localhost web interface with Tailwind CSS and Lucide icons. Full vault management in the browser.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Current Status -->
+        <section class="reveal stagger-2">
+          <h2 class="text-2xl font-heading text-white mb-4 uppercase tracking-widest heading-line">Current Status</h2>
+          <div class="bg-surface p-6 rounded-lg border border-border">
+            <div class="flex items-center gap-4 mb-4">
+              <span class="w-3 h-3 rounded-full bg-ember-core animate-pulse"></span>
+              <span class="text-white font-bold tracking-wider">Active Development</span>
+            </div>
+            <p class="text-muted-text">
+              CoalBox is currently in active development. Core vault management, CLI, import/export, and WebUI are functional. The project is stabilizing for a wider release.
+            </p>
+          </div>
+        </section>
+
+        <!-- Recent Updates -->
+        <section class="reveal stagger-3">
+          <h2 class="text-2xl font-heading text-white mb-4 uppercase tracking-widest heading-line">Recent Updates</h2>
+          {releases.length > 0 ? (
+            <ul class="space-y-4">
+              {releases.map((r) => (
+                <li class="border-l-2 border-cinder-mid pl-4 py-1">
+                  <span class="text-sm text-ember-light font-bold mb-1 block">{r.date}</span>
+                  <p class="text-muted-text">
+                    {r.name}
+                    {r.prerelease && <span class="text-xs text-cinder-mid ml-1">(pre-release)</span>}
+                    — <a href={r.url} target="_blank" rel="noopener noreferrer" class="text-ember-core hover:underline">View on GitHub</a>
+                  </p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p class="text-muted-text">No releases yet.</p>
+          )}
+        </section>
+
+      </div>
+
+      <!-- Sidebar Area -->
+      <aside class="space-y-8 reveal-right stagger-2">
+        
+        <!-- Quick Links -->
+        <div class="bg-card p-6 rounded-lg border border-border">
+          <h3 class="text-xl font-heading text-white mb-4 uppercase tracking-widest">Quick Links</h3>
+          <ul class="space-y-3">
+            <li>
+              <a href="/coalbox/docs" class="flex items-center gap-2 text-muted-text hover:text-ember-light transition-colors group">
+                <span class="text-cinder-mid group-hover:text-ember-core transition-colors">▶</span> Documentation
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/SabeeirSharrma/CoalBox" class="flex items-center gap-2 text-muted-text hover:text-ember-light transition-colors group">
+                <span class="text-cinder-mid group-hover:text-ember-core transition-colors">▶</span> Source Code
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/SabeeirSharrma/CoalBox/releases" class="flex items-center gap-2 text-muted-text hover:text-ember-light transition-colors group">
+                <span class="text-cinder-mid group-hover:text-ember-core transition-colors">▶</span> Releases
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Tech Stack -->
+        <div class="bg-card p-6 rounded-lg border border-border">
+          <h3 class="text-xl font-heading text-white mb-4 uppercase tracking-widest">Tech Stack</h3>
+          <ul class="space-y-2 text-sm text-muted-text">
+            <li class="flex items-center gap-2"><span class="text-ember-core">›</span> Rust 1.85+</li>
+            <li class="flex items-center gap-2"><span class="text-ember-core">›</span> AES-256-GCM</li>
+            <li class="flex items-center gap-2"><span class="text-ember-core">›</span> Argon2id</li>
+            <li class="flex items-center gap-2"><span class="text-ember-core">›</span> Axum (WebUI)</li>
+            <li class="flex items-center gap-2"><span class="text-ember-core">›</span> Tailwind CSS</li>
+          </ul>
+        </div>
+
+        <!-- Requirements -->
+        <div class="bg-card p-6 rounded-lg border border-border">
+          <h3 class="text-xl font-heading text-white mb-4 uppercase tracking-widest">Requirements</h3>
+          <ul class="space-y-2 text-sm text-muted-text">
+            <li class="flex items-center gap-2"><span class="text-ember-core">›</span> Rust 1.85+ (for building)</li>
+            <li class="flex items-center gap-2"><span class="text-ember-core">›</span> No runtime deps beyond glibc</li>
+          </ul>
+        </div>
+        
+      </aside>
+
+    </div>
+  </div>
+</MainLayout>
