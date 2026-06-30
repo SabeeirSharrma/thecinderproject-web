@@ -4,7 +4,7 @@ import MainLayout from '../../layouts/MainLayout.astro';
 // Fetch latest releases from GitHub
 let releases: { tag: string; date: string; name: string; url: string; prerelease: boolean }[] = [];
 try {
-  const res = await fetch('https://api.github.com/repos/SabeeirSharrma/gitflare/releases?per_page=3');
+  const res = await fetch('https://api.github.com/repos/SabeeirSharrma/CoalBox/releases?per_page=3');
   if (res.ok) {
     const data = await res.json();
     releases = data.map((r: any) => ({
@@ -18,13 +18,13 @@ try {
 } catch {}
 ---
 
-<MainLayout title="GitFlare" description="Self-hosted Git repository hosting server — lean, transparent, auditable.">
+<MainLayout title="CoalBox" description="Local-first, open-format password manager.">
   <div class="container mx-auto px-4 py-16 max-w-4xl">
     
     <!-- Header -->
     <header class="mb-16 border-b border-border pb-8">
-      <h1 class="text-5xl md:text-6xl font-heading text-white mb-4 uppercase tracking-widest anim-slide-up">GitFlare</h1>
-      <p class="text-2xl text-ember-core font-heading tracking-wide anim-slide-up delay-2">Self-hosted Git repository hosting server.</p>
+      <h1 class="text-5xl md:text-6xl font-heading text-white mb-4 uppercase tracking-widest anim-slide-up">CoalBox</h1>
+      <p class="text-2xl text-ember-core font-heading tracking-wide anim-slide-up delay-2">Local-first, open-format password manager.</p>
     </header>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
@@ -37,39 +37,46 @@ try {
           <h2 class="text-2xl font-heading text-white mb-4 uppercase tracking-widest heading-line">Overview</h2>
           <div class="prose prose-invert prose-cinder">
             <p>
-              GitFlare is a lean, self-hosted Git server built in Python. It sits as a thin 
-              layer on top of Git's own tooling — delegating all object storage and protocol 
-              handling to Git itself, while providing auth, repo management, and (eventually) 
-              a web UI on top.
+              CoalBox is a password manager that runs entirely on your local machine. 
+              It stores your credentials in a single encrypted <code class="text-ember-light bg-card px-1.5 py-0.5 rounded text-xs">.emberkeys</code> file 
+              that you control. No cloud service, no subscription, no vendor lock-in.
             </p>
             <p>
-              It is <strong>not</strong> a GitHub/GitLab replacement. GitFlare is a 
-              <strong>minimal, auditable Git server</strong> — no databases, no ORM, no 
-              unnecessary infrastructure. Just Git, Python, and your bare repos.
+              Your vault lives on your machine. No account, no server, no internet required. 
+              The <code class="text-ember-light bg-card px-1.5 py-0.5 rounded text-xs">.emberkeys</code> format is fully documented and open — 
+              you are never locked in.
             </p>
           </div>
-          <p class="text-xs text-muted-text mt-2">Builds from source, no pre-compiled binaries. How to install: <a href="/gitflare/docs">Documentation</a></p>
+          <p class="text-xs text-muted-text mt-2">Builds from source, installs to /usr/local/bin. No leftover dependencies. How to install: <a href="/coalbox/docs">Documentation</a></p>
         </section>
 
-        <!-- Features -->
+        <!-- Key Features -->
         <section class="reveal stagger-1">
           <h2 class="text-2xl font-heading text-white mb-4 uppercase tracking-widest heading-line">Key Features</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="bg-surface p-5 rounded-lg border border-border">
-              <h3 class="text-white font-bold tracking-wider mb-2">HTTP Smart Protocol</h3>
-              <p class="text-muted-text text-sm">Full clone, fetch, and push over HTTP using Git's own <code class="text-ember-light bg-card px-1.5 py-0.5 rounded text-xs">http-backend</code>.</p>
+              <h3 class="text-white font-bold tracking-wider mb-2">Vault Management</h3>
+              <p class="text-muted-text text-sm">AES-256-GCM encryption with Argon2id key derivation. Auto-lock after configurable inactivity.</p>
             </div>
             <div class="bg-surface p-5 rounded-lg border border-border">
-              <h3 class="text-white font-bold tracking-wider mb-2">Token Auth</h3>
-              <p class="text-muted-text text-sm">Per-repo access tokens with bcrypt hashing, stored in your system keychain.</p>
+              <h3 class="text-white font-bold tracking-wider mb-2">Entry Types</h3>
+              <p class="text-muted-text text-sm">Login, Authenticator, Secure Note, Payment Card, and Identity entries with custom fields.</p>
             </div>
             <div class="bg-surface p-5 rounded-lg border border-border">
-              <h3 class="text-white font-bold tracking-wider mb-2">SSH Key Auth</h3>
-              <p class="text-muted-text text-sm">SSH key management via admin CLI with <code class="text-ember-light bg-card px-1.5 py-0.5 rounded text-xs">git-shell</code> restriction.</p>
+              <h3 class="text-white font-bold tracking-wider mb-2">Password Generator</h3>
+              <p class="text-muted-text text-sm">Character mode and passphrase mode with EFF large wordlist (7776 words).</p>
             </div>
             <div class="bg-surface p-5 rounded-lg border border-border">
-              <h3 class="text-white font-bold tracking-wider mb-2">Lightweight</h3>
-              <p class="text-muted-text text-sm">FastAPI + uvicorn, no database, no ORM. Just bare Git repos with flat JSON metadata.</p>
+              <h3 class="text-white font-bold tracking-wider mb-2">Import / Export</h3>
+              <p class="text-muted-text text-sm">Import from CSV, Bitwarden JSON, KeePass XML, 1Password 1PUX. Export to plaintext JSON.</p>
+            </div>
+            <div class="bg-surface p-5 rounded-lg border border-border">
+              <h3 class="text-white font-bold tracking-wider mb-2">TOTP & Breach Checking</h3>
+              <p class="text-muted-text text-sm">TOTP code generation (RFC 6238) and HaveIBeenPwned breach checking via k-anonymity.</p>
+            </div>
+            <div class="bg-surface p-5 rounded-lg border border-border">
+              <h3 class="text-white font-bold tracking-wider mb-2">WebUI</h3>
+              <p class="text-muted-text text-sm">Redesigned localhost web interface with Tailwind CSS and Lucide icons. Full vault management in the browser.</p>
             </div>
           </div>
         </section>
@@ -83,7 +90,7 @@ try {
               <span class="text-white font-bold tracking-wider">Active Development</span>
             </div>
             <p class="text-muted-text">
-              GitFlare is currently in active development. HTTP push/pull with token auth and SSH key auth are functional. The admin CLI and credential helper are stabilizing.
+              CoalBox is currently in active development. Core vault management, CLI, import/export, and WebUI are functional. The project is stabilizing for a wider release.
             </p>
           </div>
         </section>
@@ -119,17 +126,17 @@ try {
           <h3 class="text-xl font-heading text-white mb-4 uppercase tracking-widest">Quick Links</h3>
           <ul class="space-y-3">
             <li>
-              <a href="/gitflare/docs" class="flex items-center gap-2 text-muted-text hover:text-ember-light transition-colors group">
+              <a href="/coalbox/docs" class="flex items-center gap-2 text-muted-text hover:text-ember-light transition-colors group">
                 <span class="text-cinder-mid group-hover:text-ember-core transition-colors">▶</span> Documentation
               </a>
             </li>
             <li>
-              <a href="https://github.com/TheCinderProject/gitflare" class="flex items-center gap-2 text-muted-text hover:text-ember-light transition-colors group">
+              <a href="https://github.com/SabeeirSharrma/CoalBox" class="flex items-center gap-2 text-muted-text hover:text-ember-light transition-colors group">
                 <span class="text-cinder-mid group-hover:text-ember-core transition-colors">▶</span> Source Code
               </a>
             </li>
             <li>
-              <a href="https://github.com/TheCinderProject/gitflare/releases" class="flex items-center gap-2 text-muted-text hover:text-ember-light transition-colors group">
+              <a href="https://github.com/SabeeirSharrma/CoalBox/releases" class="flex items-center gap-2 text-muted-text hover:text-ember-light transition-colors group">
                 <span class="text-cinder-mid group-hover:text-ember-core transition-colors">▶</span> Releases
               </a>
             </li>
@@ -140,11 +147,11 @@ try {
         <div class="bg-card p-6 rounded-lg border border-border">
           <h3 class="text-xl font-heading text-white mb-4 uppercase tracking-widest">Tech Stack</h3>
           <ul class="space-y-2 text-sm text-muted-text">
-            <li class="flex items-center gap-2"><span class="text-ember-core">›</span> Python 3.11+</li>
-            <li class="flex items-center gap-2"><span class="text-ember-core">›</span> FastAPI + Uvicorn</li>
-            <li class="flex items-center gap-2"><span class="text-ember-core">›</span> Git (http-backend)</li>
-            <li class="flex items-center gap-2"><span class="text-ember-core">›</span> bcrypt</li>
-            <li class="flex items-center gap-2"><span class="text-ember-core">›</span> keyring</li>
+            <li class="flex items-center gap-2"><span class="text-ember-core">›</span> Rust 1.85+</li>
+            <li class="flex items-center gap-2"><span class="text-ember-core">›</span> AES-256-GCM</li>
+            <li class="flex items-center gap-2"><span class="text-ember-core">›</span> Argon2id</li>
+            <li class="flex items-center gap-2"><span class="text-ember-core">›</span> Axum (WebUI)</li>
+            <li class="flex items-center gap-2"><span class="text-ember-core">›</span> Tailwind CSS</li>
           </ul>
         </div>
 
@@ -152,9 +159,8 @@ try {
         <div class="bg-card p-6 rounded-lg border border-border">
           <h3 class="text-xl font-heading text-white mb-4 uppercase tracking-widest">Requirements</h3>
           <ul class="space-y-2 text-sm text-muted-text">
-            <li class="flex items-center gap-2"><span class="text-ember-core">›</span> Python 3.11+</li>
-            <li class="flex items-center gap-2"><span class="text-ember-core">›</span> Git installed</li>
-            <li class="flex items-center gap-2"><span class="text-ember-core">›</span> pip</li>
+            <li class="flex items-center gap-2"><span class="text-ember-core">›</span> Rust 1.85+ (for building)</li>
+            <li class="flex items-center gap-2"><span class="text-ember-core">›</span> No runtime deps beyond glibc</li>
           </ul>
         </div>
         
