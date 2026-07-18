@@ -1,4 +1,4 @@
-# sabeeirsharrma.github.io / thecinderproject.qd.je
+# thecinderproject.qd.je
 
 The official website for **The Cinder Project**, an Open-source organization dedicated to making a safer internet through software/tools.
 
